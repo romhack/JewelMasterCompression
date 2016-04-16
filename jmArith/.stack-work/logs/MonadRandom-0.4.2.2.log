@@ -1,0 +1,39 @@
+Configuring MonadRandom-0.4.2.2...
+setup-Simple-Cabal-1.22.5.0-ghc-7.10.3.exe: fd:4: hGetContents: invalid argument (invalid byte sequence)
+Building MonadRandom-0.4.2.2...
+Preprocessing library MonadRandom-0.4.2.2...
+[1 of 2] Compiling Control.Monad.Random.Class ( Control\Monad\Random\Class.hs, .stack-work\dist\2672c1f3\build\Control\Monad\Random\Class.o )
+[2 of 2] Compiling Control.Monad.Random ( Control\Monad\Random.hs, .stack-work\dist\2672c1f3\build\Control\Monad\Random.o )
+
+Control\Monad\Random.hs:53:1: Warning:
+    Module ‘Control.Monad.Error’ is deprecated:
+      Use Control.Monad.Except instead
+
+Control\Monad\Random.hs:69:1: Warning:
+    The import of ‘Data.Monoid’ is redundant
+      except perhaps to import instances from ‘Data.Monoid’
+    To import instances alone, use: import Data.Monoid()
+
+Control\Monad\Random.hs:205:11: Warning:
+    In the use of type constructor or class ‘Error’
+    (imported from Control.Monad.Error, but defined in Control.Monad.Trans.Error):
+    Deprecated: "Use Control.Monad.Trans.Except instead"
+
+Control\Monad\Random.hs:205:51: Warning:
+    In the use of type constructor or class ‘ErrorT’
+    (imported from Control.Monad.Error, but defined in Control.Monad.Trans.Error):
+    Deprecated: "Use Control.Monad.Trans.Except instead"
+
+Control\Monad\Random.hs:250:11: Warning:
+    In the use of type constructor or class ‘Error’
+    (imported from Control.Monad.Error, but defined in Control.Monad.Trans.Error):
+    Deprecated: "Use Control.Monad.Trans.Except instead"
+
+Control\Monad\Random.hs:250:53: Warning:
+    In the use of type constructor or class ‘ErrorT’
+    (imported from Control.Monad.Error, but defined in Control.Monad.Trans.Error):
+    Deprecated: "Use Control.Monad.Trans.Except instead"
+In-place registering MonadRandom-0.4.2.2...
+Installing library in
+C:\Users\gaponoa\AppData\Roaming\stack\snapshots\4a27f884\lib\x86_64-windows-ghc-7.10.3\MonadRandom-0.4.2.2-Gln6F672JDx78FHA3hiU0A
+Registering MonadRandom-0.4.2.2...

@@ -1,0 +1,38 @@
+gfx byte is copied here:
+00:4AC2  B9 82  EOR.L   D4,D2                    A0=0003A6A4 A1=FFFFCE00 A2=FFFFC780 A3=00004AC2 A4=00C00000 A5=00000835 A6=FFFFFC00 A7=00FFFDC0 D0=00000000 D1=00000001 D2=00000000 D3=00000000 D4=00000011 D5=0000DA36 D6=0000000F D7=00000004 xnZvc
+00:4AC4  28 82  MOVE.l  D2,(A4)                  A0=0003A6A4 A1=FFFFCE00 A2=FFFFC780 A3=00004AC2 A4=00C00000 A5=00000835 A6=FFFFFC00 A7=00FFFDC0 D0=00000000 D1=00000001 D2=00000011 D3=00000000 D4=00000011 D5=0000DA36 D6=0000000F D7=00000004 xnzvc
+
+encoded GFX starts from 3A600:
+00:4A4C  34 18  MOVE.w  (A0)+,D2                 A0=0003A600 A1=FFFFCE00 A2=FFFFC780 A3=00004AB8 A4=00C00000 A5=FFFFD404 A6=FFFFFC00 A7=00FFFDC0 D0=0000FFFF D1=00000000 D2=00100098 D3=00100110 D4=0000FFFF D5=000000D0 D6=0000FFFF D7=00000000 xnzvc
+00:4A4E  E3 4A  LSL.W   #1,D2                    A0=0003A602 A1=FFFFCE00 A2=FFFFC780 A3=00004AB8 A4=00C00000 A5=FFFFD404 A6=FFFFFC00 A7=00FFFDC0 D0=0000FFFF D1=00000000 D2=00108118
+
+judging by code, next packed gfx piece is at 3B728:
+ROM:000017FA unpackTitleScreen:
+ROM:000017FA                 move.l  #$40000000,(VDP_CTRL).l
+ROM:00001804                 lea     (unk_3A600).l,a0 ; load ptr to packed title screen gfx
+ROM:0000180A                 jsr     (unpackGfx).l
+ROM:00001810                 move.l  #$40000001,(VDP_CTRL).l
+ROM:0000181A                 lea     (unk_3B728).l,a0
+ROM:00001820                 jsr     (unpackGfx).l
+
+compressed block map:
+3A600-3A601 first word: first bit is a xor or not-xor flag, 
+			rest 15 bits is a plain size of data / 8: counter is for longwords: 4 bytes, so minimal size is 4*8*1 = 32, i.e. 64 pixels - exactly 1 tile in 4bpp
+8118 means it will be xored unpack, 118 tiles will be unpacked
+
+
+
+
+3A602-3A652: compressed look-up buffer, which will be used during unpack
+
+LUT format: word 
+
+hibyte is used bits of entry: 8-bitcount are unused in currently decompressed entry, so LUT entry is repeated 2^(8-bitcount) times: so, if 8 bits are used, 08XX word is put 1 time. 07XX word should be put in LUT 2 times, as low bit is unused and can be any bit - we will still read proper 07XX entry from LUT, so entries like 03XX should be put 0x20 times. Note, that it's a word count, so 03XX will use 0x40 bytes of LUT
+lobyte XY is a RLE entry of pixels: X is repeat counter (0 means single pixel copy), Y is actually 4 bits for concrete pixel
+
+last 6-bit entry in lut is reserved (so last 8 bytes in LUT are zeroes): if you hit it, you just read next 7 bits from stream as a raw RLE entry. For rare entries, which didn't fit the lut size.
+
+Compression technique: read a byte from compressed stream and check a LUT entry at this byte offset. The entry will show in a hi byte bits, which this entry takes (higher the probability of RLE entry, less bits takes to encode and more place
+it takes in LUT table to store (analog of probability interval on axis)). All other bits, we've read in the beginning LUT offset byte are just another entry bits: shiftout used bits and check next 8 bits from compressed stream/
+
+ 
