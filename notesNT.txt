@@ -1,3 +1,33 @@
+1. 22CFE-230E5 LUT of NT entries. For SEGA its 2 bytes: Attribute byte and tile index byte.
+It's copied using copy commands: title screen nametables are compressed hardly, so second compression just copies raw bytes all the time and not used: Only Copy 0x7F bytes command used (0xFF byte each 0x7F bytes)
+First 0xF0 bytes are RLE encoded attribute bytes of LUT. And then up to the end there goes encoded tile indexes of LUT.
+
+2. After copy both attribute table and indexes table are RLE unpacked:
+   1YYY YYYY - it's RAW: copy next Y bytes as raw.
+   0YYY YYYY ZZZZ ZZZZ - it's RLE: repeat Z byte Y times
+   0000 0000 - end of packed data.
+LUT tile indexes bytes are stored in AA BB YY ZZ scheme, as on the screen it's meta-tile, layed out as:
+AA BB
+YY ZZ
+Whole LUT is for 0x400 tiles (0x100 meta tiles), so it can be addressed by single byte.
+
+
+3. 22b00-22bf1 offsets of LUT table (indexes of Meta tiles in LUT). 
+It's unpacked straight as in item 2.
+
+4. Take Meta tile index, search it in NT LUT, copy to Name Table 4x4 meta tile, until the end.
+
+Whole screen is title is 40 x 14 tiles or (20x7 metatiles)
+
+-----details and addresses:
+
+
+22BF2 continues unknown data, packed with RLE - fill with 0s changes nothing.
+
+
+
+
+
 transfered to VDP at C50C, from RAM FF845c
 
 4010 4012 4020 4022 4030 4032
@@ -28,7 +58,7 @@ if count hibit is set, then copy next count bytes to output.
 
 compressed stream is loaded from 22CFE and has FF every 80th byte, which should be ignored - it's just copy command.
 
-22cff-22def are compressed fist attribut bytes of nametable entry. it's greatly compressed with RLE. 
+22cff-22def are compressed fist attribute bytes of nametable entry. it's greatly compressed with RLE. 
 22def-230E5 there go second bytes, which is frequently hardly compressed
 
 {-- details for LUT
@@ -44,7 +74,6 @@ first byte in tile index LUT is copied from 22CFE
 fist byte is FF, FF & 7F - this is counter, we copy 7F bytes from rom. Then next control byte. In title screen it's only copying happens, so just skip each 80th byte.
 --}
 
-22BF2 continues unknown data, packed with RLE.
 
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -59,4 +88,5 @@ ROM:00004F38 moveq   #$F,d1 - 16 16x16 blocks in a screen
 ROM:00004F3A jsr     (lookUpIdx)
 
 title is 40 (0x28) tiles wide and 2x7 tiles in height
+_________________________________________________________________________________________________________________________
 
