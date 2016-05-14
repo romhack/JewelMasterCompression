@@ -17,7 +17,7 @@ version = Version [0,1,0,0] []
 bindir, libdir, datadir, libexecdir, sysconfdir :: FilePath
 
 bindir     = "H:\\Projects\\JewelMaster\\jmArith\\.stack-work\\install\\89b54721\\bin"
-libdir     = "H:\\Projects\\JewelMaster\\jmArith\\.stack-work\\install\\89b54721\\lib\\x86_64-windows-ghc-7.10.3\\jmArith-0.1.0.0-GVM8j0yxhfqJ3cSyYORrr4"
+libdir     = "H:\\Projects\\JewelMaster\\jmArith\\.stack-work\\install\\89b54721\\lib\\x86_64-windows-ghc-7.10.3\\jmArith-0.1.0.0-7wykciRIsEsDOgKhYC6KTu"
 datadir    = "H:\\Projects\\JewelMaster\\jmArith\\.stack-work\\install\\89b54721\\share\\x86_64-windows-ghc-7.10.3\\jmArith-0.1.0.0"
 libexecdir = "H:\\Projects\\JewelMaster\\jmArith\\.stack-work\\install\\89b54721\\libexec"
 sysconfdir = "H:\\Projects\\JewelMaster\\jmArith\\.stack-work\\install\\89b54721\\etc"

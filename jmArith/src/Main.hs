@@ -1,4 +1,5 @@
 module Main where
+import           Control.Monad.State
 import           Data.Binary.Get
 import           Data.Bits
 import qualified Data.Bitstream.Lazy  as Bi
@@ -7,8 +8,9 @@ import           Data.List            (foldl', group, sortBy)
 import           Data.List.Split
 import qualified Data.Map.Strict      as M
 import           Data.Maybe           (fromJust)
+import           Data.Ord             (comparing)
 import           Data.Word
-import Data.Ord (comparing)
+import           System.Environment
 
 data LutEntry = LutEntry {bitLen:: Word8, rleCount:: Word8, rleData:: Word8}
   deriving (Show)
@@ -18,23 +20,35 @@ type EncodeDictionary = M.Map RleEntry [Bool] --reverse map for encoding: value 
 data RleEntry = Code {len:: Int, val:: Word8} --zero len means 1 raw byte
   deriving (Show, Eq, Ord)
 
-gfxSizeOffset = 0x3A600
-lutEncodedOffset = 0x3A602
+data StreamCounter a = StreamCounter {stream :: [a], inVal :: Word8, outVal :: Int} --stream with statistics embedded
+
+gfxOffset = 0x3A600
 lutEntriesCount = 252 :: Int--252 entries are in LUT: last 4 entries for extra entries
-gfxEncodedOffset = 0x3A653
 
-
-fillLut :: Word8 -> [Word8] -> LutMap --form a new LUT as map with given initial pixel value and serialized lut
-fillLut _ (0xFF:_) = M.empty
-fillLut pixVal (a:b:c:stream)
-  | a < 0x80 = M.insert (offs b (loNybble a)) LutEntry {bitLen = loNybble a, rleCount = hiNybble a, rleData = pixVal} $ fillLut pixVal (c:stream) --dont read new pix value
-  | otherwise = M.insert (offs c (loNybble b)) LutEntry {bitLen = loNybble b, rleCount = hiNybble b, rleData = loNybble a} $ fillLut (loNybble a) stream
-      where
+fillLut :: State (StreamCounter Word8) LutMap --parse LUT from serialized view
+fillLut = do
+  s <- get
+  case stream s of
+    [] -> error "Unexpected input stream end in next LUT entry read"
+    (0xFF:_) -> do --end of LUT byte reached
+      put $ StreamCounter [] 0 (outVal s + 1) --only outval counter needed in return state
+      return M.empty
+    (a:b:c:stream) -> do
+      let
         hiNybble x = (x `shiftR` 4) .&. 0xF
         loNybble x = x .&. 0xF
         offs x bl = x `shiftL` fromIntegral (8 - bl) --each lut entry takes 2^bitlen bytes in LUT
+        pixVal = inVal s
+        outCount = outVal s
+      if a < 0x80 then do --old pixel value will be used
+        put $ StreamCounter (c: stream) pixVal (outCount + 2)
+        rest <- fillLut
+        return $ M.insert (offs b (loNybble a)) LutEntry {bitLen = loNybble a, rleCount = hiNybble a, rleData = pixVal} rest
+      else do --read and use new pixel value
+        put $ StreamCounter stream (loNybble a) (outCount + 3)
+        rest <- fillLut
+        return $ M.insert (offs c (loNybble b)) LutEntry {bitLen = loNybble b, rleCount = hiNybble b, rleData = loNybble a} rest
 
------------------------------------------DECODING-----------------------------------------------------------------------------------
 toBoolStream :: Bs.ByteString -> [Bool] --convert to bytestream and then to bool via bitstream
 toBoolStream inputString = Bi.unpack (Bi.fromByteString inputString :: Bi.Bitstream Bi.Right)
 
@@ -48,14 +62,19 @@ numToBits :: (Bits a, Num a) => Int -> a -> [Bool] --number with a given bitfiel
 numToBits n b = map (testBit b) [n-1, n-2..0]
 
 deserialize :: LutMap -> [Bool] -> [RleEntry]
+deserialize _ [] = []
 deserialize lutMap xs = if lutIdx < 0xFC
   then Code (fromIntegral (rleCount lutEntry)) (rleData lutEntry): deserialize lutMap (drop (fromIntegral(bitLen lutEntry)) xs) --usual RLE entry found in lut
   else Code (bitsToNum (take 3 (drop 6 xs))) (bitsToNum (take 4 (drop (6+3) xs))) : deserialize lutMap (drop (6+7) xs) --raw literal case - extended last 6-bit entry in lut
   where --take 8 bits, check bitcount for current entry and utiilze only that bits, then check another 8 bits
-    lutIdx = bitsToNum (take 8 xs)
+    lutIdx = bitsToNum (safeTake 8 xs)
+    safeTake n is = if length (take n is) < n
+      then is ++ replicate (n - length is) False -- in case of remainder is shorter than n bits
+      else take n is
     lutEntry = snd.fromJust $ M.lookupLE lutIdx lutMap
 
-decode :: Int -> [RleEntry] -> [Word8]
+decode :: Int -> [RleEntry] -> [Word8] --decode RLE to bytes, stop at pixel count achieve
+decode _ [] = []
 decode count (Code l v : xs) = if count <= 0 then []
                                else replicate (l + 1) v ++ decode (count - l - 1) xs
 
@@ -67,27 +86,8 @@ mergeNybbles (a:b:xs) = ((a `shiftL` 4) .|. b) : mergeNybbles xs
 xorDecrypt :: [Word8] -> [Word8] --first word32 is plain. XOR next encrypted word32 with previous plain word32, you get next plain word32
 xorDecrypt xs = concat $ scanl1 (zipWith xor) $ chunksOf 4 xs
 
-{--
-  ----------------------------DECODE
-main :: IO ()
-main = do
-  input <- Bs.readFile "../Jewel Master (UE) [!].bin"
-  let
-    lutEncoded = Bs.unpack $ Bs.drop lutEncodedOffset input
-    lut = fillLut 0 lutEncoded
-    gfxPixSize =
-      if sizeWord < 0x8000
-        then error "Not-encrypted scheme not implemented" --hibit is a xor-encryption flag
-        else fromIntegral (sizeWord .&. 0x7FFF) * 8 * 8 --tile count * tile size in pixels
-      where sizeWord = runGet getWord16be $ Bs.drop gfxSizeOffset input
-    encodedStream = toBoolStream $ Bs.drop gfxEncodedOffset input
-    rleEntries = deserialize lut encodedStream
-    decoded = decode gfxPixSize rleEntries
-    decodedDecrypted = xorDecrypt $ mergeNybbles decoded
-  --print $ lut
-  Bs.writeFile "decoded.bin" $ Bs.pack decodedDecrypted
-  writeFile "RleEntriesMaster.txt" $ show $ take 10000 rleEntries
---}
+--------------------------------------------------------------------------------
+
 xorEncrypt :: [Word8] -> [Word8] -- just XOR previous plain word32 with next plain word32.
 xorEncrypt xs = concat $ zipWith (zipWith xor) plain shifted
   where
@@ -125,8 +125,6 @@ getProbability weight total
         pre = 2^bitSize
         suc = 2^(bitSize + 1)
 
-
-
 buildLutMapEncode :: [(Int, RleEntry)] -> LutMap --build a proper lut map from histogarm for seriaization
 buildLutMapEncode xs = go lutEntries 0 --second param for offset tracking
   where
@@ -162,19 +160,41 @@ buildEncodeDictionary m = go (M.toList m)
         bitCode = numToBits (fromIntegral bLen) slotNum
         slotNum = offs `shiftR` fromIntegral (8 - bLen)
 
-serialize :: EncodeDictionary -> [RleEntry] -> [Bool]
+serialize :: EncodeDictionary -> [RleEntry] -> [Bool] --build a bool stream by the dictionary
 serialize dict = concatMap getCode
   where
   getCode e@(Code l v) = case M.lookup e dict of
     Just code -> code
-    Nothing -> [False, False, False, False, False, False] ++ numToBits 4 l ++ numToBits 4 v --code not found, inject raw in bitstream
-
+    Nothing -> [True, True, True, True, True, True] ++ numToBits 3 l ++ numToBits 4 v --code not found, inject raw in bitstream
 
 
   ----------------------------ENCODE
 main :: IO()
-main = do
-  input <- Bs.readFile "decodedMaster.bin"
+main = getArgs >>= parse
+parse ["-v"] = putStrLn "jmArith compression tool 0.1"
+parse ["-d"] = decodeFile
+parse ["-e"] = encodeFile
+parse _ = putStrLn "Usage: jmArith [-vde]"
+
+decodeFile = do
+  input <- Bs.readFile "Jewel Master (UE) [!].bin"
+  let
+    gfxPixSize = if sizeWord < 0x8000
+      then error "Not-encrypted scheme not implemented" --hibit is a xor-encryption flag
+      else fromIntegral (sizeWord .&. 0x7FFF) * 8 * 8 --tile count * tile size in pixels
+      where sizeWord = runGet getWord16be $ Bs.drop gfxOffset input
+    lutSerialized = Bs.unpack $ Bs.drop (gfxOffset + 2) input --LUT is right after size word
+    (lut, st) = runState fillLut $ StreamCounter lutSerialized 0 0
+    gfxEncodedOffset = gfxOffset + 2 + fromIntegral (outVal st) --compressed stream right after LUT
+    encodedStream = toBoolStream $ Bs.drop gfxEncodedOffset input
+    rleEntries = deserialize lut encodedStream
+    decoded = decode gfxPixSize rleEntries
+    decodedDecrypted = xorDecrypt $ mergeNybbles decoded
+  Bs.writeFile "decoded.bin" $ Bs.pack decodedDecrypted
+
+
+encodeFile = do
+  input <- Bs.readFile "decoded.bin"
   let
     decodedEncrypted = xorEncrypt $ Bs.unpack input
     decodedEncryptedPixels = splitNybbles decodedEncrypted
@@ -183,13 +203,9 @@ main = do
     --convert frequencies in histogram to range probabilities:
     --252 entries in LUT (last 4 entries for expansion). Total entries count is length of encoded entries list.
     histogramRanges = map (\(a,b) -> (getProbability a (length encoded), b)) histogramSorted
-    lutEncode = buildLutMapEncode histogramRanges
+    lutEncode = buildLutMapEncode histogramRanges --build new lut for encoding
     lutMapSerialized = serializeLutMap lutEncode
     encodeDictionary = buildEncodeDictionary lutEncode
     encodedStream = serialize encodeDictionary encoded
-  Bs.writeFile "encoded.bin" $ Bi.toByteString $ toBitStream encodedStream
-  --print encodedStream
-
-  --Bs.writeFile "myLut.bin" $ Bs.pack lutMapSerialized
-
-  --Bs.writeFile "decodedUnxored.bin" $ Bs.pack decodedUnxored
+  --append lut and encoded stream in one block for further ROM insert
+  Bs.writeFile "encoded.bin" $ Bs.append (Bs.pack lutMapSerialized) (Bi.toByteString $ toBitStream encodedStream)

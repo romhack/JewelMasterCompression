@@ -35,6 +35,13 @@
   (major1) == 0 && (major2) <  5 || \
   (major1) == 0 && (major2) == 5 && (minor) <= 6)
 
+/* package mtl-2.2.1 */
+#define VERSION_mtl "2.2.1"
+#define MIN_VERSION_mtl(major1,major2,minor) (\
+  (major1) <  2 || \
+  (major1) == 2 && (major2) <  2 || \
+  (major1) == 2 && (major2) == 2 && (minor) <= 1)
+
 /* package split-0.2.3 */
 #define VERSION_split "0.2.3"
 #define MIN_VERSION_split(major1,major2,minor) (\
@@ -112,5 +119,5 @@
   (major1) == 2 && (major2) <  25 || \
   (major1) == 2 && (major2) == 25 && (minor) <= 0)
 
-#define CURRENT_PACKAGE_KEY "jmAri_GVM8j0yxhfqJ3cSyYORrr4"
+#define CURRENT_PACKAGE_KEY "jmAri_7wykciRIsEsDOgKhYC6KTu"
 
