@@ -9,15 +9,11 @@ The following steps are used for decoding:
 
 2. Read and unpack LUT from 3A602-0x3A652. 
 Plain LUT structure: 16 bit word 
-
 hibyte is used bits of entry (bitcount): (8 - bitcount) is unused bits in entry to decompress, so LUT entry is repeated 2^(8-bitcount) times: 
 so, if bitcount = 8, 08XX word is in LUT 1 time and takes exatly 2 bytes. 
-07XX word should be put in LUT 2 times, as low bit is unused and can be any bit - we will still read proper 07XX entry from LUT, so entries like 03XX should be put 0x20 times. Note, that it's a word count, so 03XX will use 0x40 bytes of LUT.
-
-lobyte XY is a RLE entry of pixels: X is repeat counter (0 means single pixel copy), Y is actually 4 bits for concrete pixel value.
-
-last 6-bit entry in lut is reserved (so last 8 bytes in LUT are zeroes): if you hit it, you just read next 7 bits from stream as a raw RLE entry (0CCC PPPP). For rare entries, which didn't fit the lut size.
-
+07XX word should be put in LUT 2 times, as low bit is unused and can be any bit - we will still read proper 07XX entry from LUT, so entries like 03XX should be put 0x20 times. Note, that it's a word count, so 03XX will use 0x40 bytes of LUT. 
+lobyte XY is a RLE entry of pixels: X is repeat counter (0 means single pixel copy), Y is actually 4 bits for concrete pixel value. 
+last 6-bit entry in lut is reserved (so last 8 bytes in LUT are zeroes): if you hit it, you just read next 7 bits from stream as a raw RLE entry (0CCC PPPP). For rare entries, which didn't fit the lut size. 
 LUT serialization scheme:
 1XXX PPPP CCCC LLLL DDDD DDDD: it's a new pixel value set: PPPP-new pixval. C - RLE entry counter, L - bitlen of entry. D is slot number of entry in plain LUT: offset = slotNum * (2^(8-L))
 0CCC LLLL DDDD DDDD: just use old pixval, rest are the same.
