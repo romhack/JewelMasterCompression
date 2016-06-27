@@ -12,9 +12,11 @@ RLE scheme:
    1YYY YYYY - it's RAW: copy next Y bytes as raw.
    0YYY YYYY ZZZZ ZZZZ - it's RLE: repeat Z byte Y times, if Y = 0 end of packed data, 
 
-LUT is a metatiles entries set, stored in AA BB YY ZZ scheme. On screen this metatile has layout: 
+LUT is a metatiles entries set, which have layout on screen: 
+```
 AA BB
 YY ZZ
+```
 Whole decoded LUT is 0x400 tiles long (0x100 meta tiles), so each metatile can be addressed by single byte.
 
 3. 22b00-22bf1 (0xF2 size) (22b00 has ptr at 0x1974): offsets of LUT table (indexes of metatiles in LUT) for front screen.
