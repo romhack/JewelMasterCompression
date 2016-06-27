@@ -1,27 +1,40 @@
 
 ==================== FINAL INTERFACE ====================
-2016-04-18 13:45:20.9686239 UTC
+2016-06-27 18:15:04.1464841 UTC
 
 interface main@main:Main 7103
-  interface hash: 6b7547cd75c5f09eb8bfda3c23e823d1
-  ABI hash: c102e7b09ade28f215063531c1123b1e
-  export-list hash: 2b51293ac4c7b5375de2ee9aac1d2bb0
-  orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
-  flag hash: 281a27cc0d2b013242d363cf6d560254
+  interface hash: ce4d63da72f3bfbccfb767767485ab26
+  ABI hash: f4287531d7ac0587d45b911fab6df5d6
+  export-list hash: a2f7df0c8d9adbba0da884f7fc5127de
+  orphan hash: cf83389f84b82b5640d64f11e2fb4449
+  flag hash: 8eff9b01e7de8b86316f31b868a3250b
   sig of: Nothing
   used TH splices: False
   where
 exports:
   Main.decode
   Main.deserialize
-  Main.getLutEncoded
+  Main.divideOnMetatiles
+  Main.encode
+  Main.getMetaTiles
+  Main.go
   Main.idxsEncodedOffset
   Main.listToHex
   Main.lookUpIdxs
   Main.lutEncodedOffset
   Main.main
   Main.mergeToWord16
+  Main.packCopyCommands
+  Main.readWords16
+  Main.serialize
+  Main.splitFromWord16
+  Main.trimRlesLen
+  Main.unpackCopyCommands
+  Main.HalfMeta
   Main.RleEntry{Main.Code Main.Raw Main.len Main.val}
+  Main.Scanline
+  Main.StreamCounter{Main.StreamCounter Main.inVal Main.outVal Main.stream}
+  Main.Title
 module dependencies:
 package dependencies: array-0.5.1.0@array_67iodizgJQIIxYVTp4emlA
                       base-4.8.2.0* binary-0.7.5.0@binar_3uXFWMoAGBg0xKP9MHKRwi*
@@ -40,6 +53,8 @@ import  -/  base-4.8.2.0:Control.Arrow 0c552df08378559be87a709d2820fffa
 import  -/  base-4.8.2.0:Data.Bits 87f514c5f0e66e224843da33c04aa38b
 import  -/  base-4.8.2.0:Data.Foldable 2ce969969ad5231eb40bd713f94f05ad
 import  -/  base-4.8.2.0:Data.List 3f0782c8d4bf50eecefcd5ea1798aac8
+import  -/  base-4.8.2.0:Data.Maybe 1cb58de2b04ee3c0c0a7dc9201184aff
+import  -/  base-4.8.2.0:Data.OldList d8fd80b0e14aa085ce6219cd89dad356
 import  -/  base-4.8.2.0:Data.Word ec8deb535202352cc8b509b14004bcbd
 import  -/  base-4.8.2.0:GHC.Base a4939789b2cfd60b36ed163e56a623cd
 import  -/  base-4.8.2.0:GHC.List 0c736920522bbd14b770342776012ab6
@@ -48,15 +63,64 @@ import  -/  base-4.8.2.0:GHC.Real 1281efa9baf803bc7859d7efb89a38b3
 import  -/  base-4.8.2.0:GHC.Show 0e1d8380a8fb0cfb07ebeda3b70cbf38
 import  -/  base-4.8.2.0:GHC.Word 10dc88543d98000abab9695a1019767d
 import  -/  base-4.8.2.0:Prelude 694dcaf039efe62df1c44834e2dbd2fb
+import  -/  base-4.8.2.0:System.Environment c73e1b71c29d9e28d4cdf8209f2f1559
+import  -/  base-4.8.2.0:System.IO 638c10c4fd4901a0aca5b77c9f14123d
 import  -/  base-4.8.2.0:Text.Printf 0276d4e7547f991f04a90f6b1e7f1f46
-import  -/  binary-0.7.5.0@binar_3uXFWMoAGBg0xKP9MHKRwi:Data.Binary.Put ea2b69244f98dfd663832cbf90d75c44
-import  -/  bytestring-0.10.6.0@bytes_6VWy06pWzJq9evDvK2d4w6:Data.ByteString.Lazy 381d43ef4fab40c90f7ad267b585f3f2
+import  -/  binary-0.7.5.0@binar_3uXFWMoAGBg0xKP9MHKRwi:Data.Binary.Get f87c878c97e7480a92e049b12d3a9019
+import  -/  binary-0.7.5.0@binar_3uXFWMoAGBg0xKP9MHKRwi:Data.Binary.Get.Internal e816b9382f85225ec546a7e8e7f31425
+import  -/  binary-0.7.5.0@binar_3uXFWMoAGBg0xKP9MHKRwi:Data.Binary.Put 3105ee566a5c25103f6c0c5075957d76
+import  -/  bytestring-0.10.6.0@bytes_6VWy06pWzJq9evDvK2d4w6:Data.ByteString.Lazy 59e7973423198e93620da16e5f7527dd
+import  -/  bytestring-0.10.6.0@bytes_6VWy06pWzJq9evDvK2d4w6:Data.ByteString.Lazy.Internal be8c2313b6f0cc8907d9784ae8e9c59d
 import  -/  ghc-prim-0.4.0.0:GHC.Classes e1f4ff80f7b5262008a595d29986fb18
 import  -/  ghc-prim-0.4.0.0:GHC.Types 6b27fb3fdbd0e3f0925a4496c66513bb
 import  -/  mtl-2.2.1@mtl_Aue4leSeVkpKLsfHIV51E8:Control.Monad.Except a48c40e49a1635a6f6c139e86212e5c9
+import  -/  mtl-2.2.1@mtl_Aue4leSeVkpKLsfHIV51E8:Control.Monad.State 3c8114545920fee1e57c3d7a07c2d0d7
+import  -/  mtl-2.2.1@mtl_Aue4leSeVkpKLsfHIV51E8:Control.Monad.State.Class 521f2360d2f7cec1d4be0e199fde9ee2
 import  -/  split-0.2.3@split_CDzOynTh4l8Ahg1HaWUL4Z:Data.List.Split 0ce5c537605fc9ad887ec02865b54394
 import  -/  split-0.2.3@split_CDzOynTh4l8Ahg1HaWUL4Z:Data.List.Split.Internals 4ea5a9e5367ae0648c6ecbbc653cbd5b
-bf2b71db01905b89412ee99b1804d185
+import  -/  transformers-0.4.2.0@trans_GZTjP9K5WFq01xC9BAGQpF:Control.Monad.Trans.State.Lazy 442cc9f80155d8aaed5b22580b659d92
+b884a4838ee2db439e23f470d6ead343
+  $fEqRleEntry :: GHC.Classes.Eq Main.RleEntry
+  DFunId[0]
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ Main.RleEntry Main.$fEqRleEntry_$c== Main.$fEqRleEntry_$c/= -}
+b884a4838ee2db439e23f470d6ead343
+  $fEqRleEntry_$c/= ::
+    Main.RleEntry -> Main.RleEntry -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: InlineRule (2, True, False)
+                (\ a15 :: Main.RleEntry b :: Main.RleEntry ->
+                 case Main.$fEqRleEntry_$c== a15 b of wild {
+                   GHC.Types.False -> GHC.Types.True
+                   GHC.Types.True -> GHC.Types.False }) -}
+b884a4838ee2db439e23f470d6ead343
+  $fEqRleEntry_$c== ::
+    Main.RleEntry -> Main.RleEntry -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ ds :: Main.RleEntry ds1 :: Main.RleEntry ->
+                 case ds of wild {
+                   Main.Raw a15
+                   -> case ds1 of wild1 {
+                        Main.Raw b1
+                        -> GHC.Classes.$fEq[]_$c==
+                             @ GHC.Word.Word8
+                             GHC.Word.$fEqWord8
+                             a15
+                             b1
+                        Main.Code ipv ipv1 -> GHC.Types.False }
+                   Main.Code a15 a16
+                   -> case ds1 of wild1 {
+                        Main.Raw ipv -> GHC.Types.False
+                        Main.Code b1 b2
+                        -> case a15 of wild2 { GHC.Types.I# x ->
+                           case b1 of wild3 { GHC.Types.I# y ->
+                           case GHC.Prim.tagToEnum#
+                                  @ GHC.Types.Bool
+                                  (GHC.Prim.==# x y) of wild4 {
+                             GHC.Types.False -> GHC.Types.False
+                             GHC.Types.True -> GHC.Word.$fEqWord8_$c== a16 b2 } } } } }) -}
+b884a4838ee2db439e23f470d6ead343
   $fShowRleEntry :: GHC.Show.Show Main.RleEntry
   DFunId[0]
   {- Strictness: m, Inline: [ALWAYS] CONLIKE,
@@ -65,7 +129,7 @@ bf2b71db01905b89412ee99b1804d185
                   Main.$fShowRleEntry_$cshowsPrec
                   Main.$fShowRleEntry_$cshow
                   Main.$fShowRleEntry_$cshowList -}
-bf2b71db01905b89412ee99b1804d185
+b884a4838ee2db439e23f470d6ead343
   $fShowRleEntry1 :: Main.RleEntry -> GHC.Show.ShowS
   {- Arity: 2,
      Unfolding: (\ w :: Main.RleEntry w1 :: GHC.Base.String ->
@@ -88,7 +152,7 @@ ec294b7586739a29cbb2b0d848a6ab35
 a03c59257cba39263804f15a3256456a
   $fShowRleEntry7 :: [GHC.Types.Char]
   {- Unfolding: (GHC.CString.unpackCString# "Raw "#) -}
-bf2b71db01905b89412ee99b1804d185
+b884a4838ee2db439e23f470d6ead343
   $fShowRleEntry_$cshow :: Main.RleEntry -> GHC.Base.String
   {- Arity: 1, Strictness: <S,1*U>,
      Unfolding: InlineRule (1, True, False)
@@ -97,13 +161,13 @@ bf2b71db01905b89412ee99b1804d185
                    GHC.Show.shows18
                    x
                    (GHC.Types.[] @ GHC.Types.Char)) -}
-bf2b71db01905b89412ee99b1804d185
+b884a4838ee2db439e23f470d6ead343
   $fShowRleEntry_$cshowList :: [Main.RleEntry] -> GHC.Show.ShowS
   {- Arity: 2,
      Unfolding: (GHC.Show.showList__
                    @ Main.RleEntry
                    Main.$fShowRleEntry1) -}
-bf2b71db01905b89412ee99b1804d185
+b884a4838ee2db439e23f470d6ead343
   $fShowRleEntry_$cshowsPrec ::
     GHC.Types.Int -> Main.RleEntry -> GHC.Show.ShowS
   {- Arity: 3, Strictness: <S,1*U(U)><S,1*U><L,U>, Inline: INLINE[0],
@@ -111,6 +175,42 @@ bf2b71db01905b89412ee99b1804d185
                 (\ w :: GHC.Types.Int w1 :: Main.RleEntry w2 :: GHC.Base.String ->
                  case w of ww { GHC.Types.I# ww1 ->
                  Main.$w$cshowsPrec ww1 w1 w2 }) -}
+d713d275ce4a79515a8668d466a66a01
+  $s$fEq[] :: GHC.Classes.Eq [GHC.Word.Word16]
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ [GHC.Word.Word16]
+                  (GHC.Classes.$fEq[]_$c== @ GHC.Word.Word16 GHC.Word.$fEqWord16)
+                  Main.$s$fEq[]_$s$fEq[]_$c/= -}
+681a9328531a70c3ccafd67a0d8b4d5c
+  $s$fEq[]_$s$fEq[]_$c/= ::
+    [GHC.Word.Word16] -> [GHC.Word.Word16] -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Inline: INLINE (sat-args=2),
+     Unfolding: InlineRule (2, False, False)
+                (\ x :: [GHC.Word.Word16] y :: [GHC.Word.Word16] ->
+                 GHC.Classes.not
+                   (GHC.Classes.$fEq[]_$c==
+                      @ GHC.Word.Word16
+                      GHC.Word.$fEqWord16
+                      x
+                      y)) -}
+8aaadedbb610cda60d8030f3cb24cb4c
+  $sconcatMap :: (a3 -> [b]) -> [a3] -> [b]
+  {- Arity: 2, HasNoCafRefs, Strictness: <L,C(U)><S,1*U>,
+     Inline: INLINE (sat-args=2),
+     Unfolding: InlineRule (2, False, False)
+                (\ @ a15 @ b f :: a15 -> [b] xs :: [a15] ->
+                 GHC.Base.build
+                   @ b
+                   (\ @ b1 c :: b -> b1 -> b1[OneShot] n :: b1[OneShot] ->
+                    GHC.Base.foldr
+                      @ a15
+                      @ b1
+                      (\ x :: a15 b2 :: b1[OneShot] ->
+                       GHC.Base.foldr @ b @ b1 c b2 (f x))
+                      n
+                      xs)) -}
 aab32dfc04bfc7543cba90a75c7c789c
   $sprintf3 ::
     GHC.Base.String -> [Text.Printf.UPrintf] -> [GHC.Types.Char]
@@ -128,7 +228,7 @@ aab32dfc04bfc7543cba90a75c7c789c
                          args
                          (GHC.Types.[] @ Text.Printf.UPrintf))
                       (GHC.Types.[] @ GHC.Types.Char))) -}
-bf2b71db01905b89412ee99b1804d185
+b884a4838ee2db439e23f470d6ead343
   $w$cshowsPrec ::
     GHC.Prim.Int#
     -> Main.RleEntry -> GHC.Base.String -> GHC.Base.String
@@ -217,23 +317,159 @@ bf2b71db01905b89412ee99b1804d185
                                 @ GHC.Types.Char
                                 Main.$fShowRleEntry2
                                 (g (GHC.Types.: @ GHC.Types.Char GHC.Show.shows8 w1))) } }) -}
-bf2b71db01905b89412ee99b1804d185
+dabffa1eb8d0ac5c6c70fd684ec7d288
+  $wa ::
+    [GHC.Word.Word8]
+    -> GHC.Types.Int
+    -> (# [Main.RleEntry], Main.StreamCounter GHC.Word.Word8 #)
+  {- Arity: 2, Strictness: <S,1*U><L,1*U(U)>, Inline: [0] -}
+201124e6f6ba3fddf6b2ccab1c84ef00
+  $wa1 ::
+    GHC.Prim.Addr#
+    -> GHC.ForeignPtr.ForeignPtrContents
+    -> GHC.Prim.Int#
+    -> GHC.Prim.Int#
+    -> Data.Binary.Get.Internal.Success [GHC.Word.Word16] r
+    -> Data.Binary.Get.Internal.Decoder r
+  {- Arity: 5, Strictness: <L,U><L,U><L,U><L,U><L,C(C1(U))>,
+     Inline: [0] -}
+bd8813619d8de7dac9e59c77467d0b71
+  $wpackCopyCommands ::
+    [GHC.Word.Word8] -> (# GHC.Word.Word8, [GHC.Word.Word8] #)
+  {- Arity: 1, HasNoCafRefs, Strictness: <S,U>, Inline: [0] -}
+ba911a5b496520ffefdeaf04375d5d33
+  $wserialize ::
+    [Main.RleEntry] -> (# GHC.Word.Word8, [GHC.Word.Word8] #)
+  {- Arity: 1, HasNoCafRefs, Strictness: <S,1*U>, Inline: [0] -}
+7efc0d579c49d36e6355e498c0f25cd6
+  $wsplitFromWord16 ::
+    [GHC.Word.Word16] -> (# [GHC.Word.Word8], [GHC.Word.Word8] #)
+  {- Arity: 1, HasNoCafRefs, Strictness: <S,1*U>, Inline: [0] -}
+a9df972c76fc8e3522fbf53bd9153782
+  $wtrimRleLen ::
+    Main.RleEntry -> (# Main.RleEntry, [Main.RleEntry] #)
+  {- Arity: 1, HasNoCafRefs, Strictness: <S,1*U>, Inline: [0] -}
+9992fd0b8116b142ccc176896bc70482
+  type HalfMeta = [GHC.Word.Word16]
+b884a4838ee2db439e23f470d6ead343
   data RleEntry
     = Raw [GHC.Word.Word8]
     | Code {len :: GHC.Types.Int, val :: GHC.Word.Word8}
-cc653335109380168e2d1ff77c43d9b2
+23716b609fcad4767d2ed33081d3339e
+  type Scanline = [Main.HalfMeta]
+95224869bebfacab039479f63487a25b
+  data StreamCounter a
+    = StreamCounter {stream :: [a],
+                     inVal :: GHC.Word.Word8,
+                     outVal :: GHC.Types.Int}
+7ec486066dba108c01c0e4d04f15e5a3
+  type Title = [Main.Scanline]
+27abb8d1efef5ffb40a93e646baa2ed0
   decode :: [Main.RleEntry] -> [GHC.Word.Word8]
   {- Arity: 1, HasNoCafRefs, Strictness: <S,1*U> -}
-e4d39e6c6bffd1f56edd6d5d20d74aef
-  deserialize :: [GHC.Word.Word8] -> [Main.RleEntry]
+ebf150c31e355e66f1637a60b79e0feb
+  deserialize ::
+    Control.Monad.Trans.State.Lazy.State
+      (Main.StreamCounter GHC.Word.Word8) [Main.RleEntry]
+  {- Arity: 1, Strictness: <S(SLL),1*U(1*U,A,1*U(U))>m,
+     Unfolding: InlineRule (0, True, True)
+                Main.deserialize1
+                  `cast`
+                (Sym (Control.Monad.Trans.State.Lazy.NTCo:StateT[0]
+                          <Main.StreamCounter GHC.Word.Word8>_N
+                          <Data.Functor.Identity.Identity>_R
+                          <[Main.RleEntry]>_N)) -}
+a2530795180c9159ce0d9dbaa1b5633e
+  deserialize1 ::
+    Main.StreamCounter GHC.Word.Word8
+    -> Data.Functor.Identity.Identity
+         ([Main.RleEntry], Main.StreamCounter GHC.Word.Word8)
+  {- Arity: 1, Strictness: <S(SLL),1*U(1*U,A,1*U(U))>m,
+     Inline: INLINE[0],
+     Unfolding: InlineRule (1, True, False)
+                (\ w :: Main.StreamCounter GHC.Word.Word8 ->
+                 case w of ww { Main.StreamCounter ww1 ww2 ww3 ->
+                 case Main.$wa ww1 ww3 of ww4 { (#,#) ww5 ww6 ->
+                 (ww5, ww6)
+                   `cast`
+                 (Sym (Data.Functor.Identity.NTCo:Identity[0]
+                           <([Main.RleEntry], Main.StreamCounter GHC.Word.Word8)>_R)) } }) -}
+4be78d58d6f3a26f344c52ebe95b7fdb
+  divideOnMetatiles ::
+    Data.ByteString.Lazy.Internal.ByteString -> Main.Scanline
+  {- Arity: 1, Strictness: <L,U>,
+     Unfolding: (\ input :: Data.ByteString.Lazy.Internal.ByteString ->
+                 Main.divideOnMetatiles_go
+                   (Main.getMetaTiles
+                      (Data.List.Split.Internals.chunksOf
+                         @ [GHC.Word.Word16]
+                         Main.divideOnMetatiles5
+                         (Data.List.Split.Internals.chunksOf
+                            @ GHC.Word.Word16
+                            Main.divideOnMetatiles4
+                            (Data.Binary.Get.runGet1
+                               @ [GHC.Word.Word16]
+                               Main.divideOnMetatiles1
+                               input))))) -}
+148b74c6a99fd1e54ab8338af096d984
+  divideOnMetatiles1 :: Data.Binary.Get.Decoder [GHC.Word.Word16]
+  {- Unfolding: (Data.Binary.Get.$wpoly_go
+                   @ [GHC.Word.Word16]
+                   Main.divideOnMetatiles2
+                   0) -}
+d6953d8fff39519ec4433f443a88bd01
+  divideOnMetatiles2 ::
+    Data.Binary.Get.Internal.Decoder [GHC.Word.Word16]
+  {- Unfolding: (Data.Binary.Get.Internal.runGetIncremental1
+                   @ [GHC.Word.Word16]
+                   Main.divideOnMetatiles3) -}
+7c3082cc6c59b13c1ce482c96a64e4f3
+  divideOnMetatiles3 ::
+    Data.Binary.Get.Internal.Decoder [GHC.Word.Word16]
+  {- Unfolding: (Main.$wa1
+                   @ [GHC.Word.Word16]
+                   __NULL
+                   Data.ByteString.Internal.$fMonoidByteString3
+                   0
+                   0
+                   (Data.Binary.Get.Internal.$WDone @ [GHC.Word.Word16])) -}
+468da8f8544b5ddeb6acae5ccde42243
+  divideOnMetatiles4 :: GHC.Types.Int
+  {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Types.I# 2) -}
+24217c5803c7fbe6dabfd9ed4c17161e
+  divideOnMetatiles5 :: GHC.Types.Int
+  {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Types.I# 20) -}
+0b12d274d0341c604b174ae5b93411a0
+  divideOnMetatiles_go ::
+    [[[GHC.Word.Word16]]] -> [[GHC.Word.Word16]]
+  {- Arity: 1, HasNoCafRefs, Strictness: <S,1*U> -}
+de6930529d8c254a372e9f3ba9d28dd0
+  encode :: [GHC.Word.Word8] -> [Main.RleEntry]
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ xs :: [GHC.Word.Word8] ->
+                 Main.go
+                   (Data.OldList.groupBy
+                      @ GHC.Word.Word8
+                      GHC.Word.$fEqWord8_$c==
+                      xs)) -}
+06c512269e71af833dfde85dc08574f5
+  getMetaTiles :: [Main.Scanline] -> [Main.Scanline]
   {- Arity: 1, Strictness: <S,1*U> -}
-0d162f99538d3faf43da16be7f22bd18
-  getLutEncoded :: [GHC.Word.Word8] -> [GHC.Word.Word8]
+0a55088c8aed03d005d51cd0d95930b8
+  go :: [[GHC.Word.Word8]] -> [Main.RleEntry]
   {- Arity: 1, Strictness: <S,1*U> -}
 38831bc6d830543a4847e58a64400dc8
   idxsEncodedOffset :: GHC.Int.Int64
   {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Int.I64# 142080) -}
-d96391eab1b44ce0393f4b2c55216e21
+9bffdddc92c3b9ab75507b8764df6210
+  inVal :: Main.StreamCounter a -> GHC.Word.Word8
+  RecSel Main.StreamCounter
+  {- Arity: 1, HasNoCafRefs, Strictness: <S(LSL),1*U(A,1*U(U),A)>,
+     Unfolding: InlineRule (1, True, False)
+                (\ @ a15 ds :: Main.StreamCounter a15 ->
+                 case ds of wild { Main.StreamCounter ds1 ds2 ds3 -> ds2 }) -}
+1557cfd293068e2e66562e39d8d728b2
   len :: Main.RleEntry -> GHC.Types.Int
   RecSel Main.RleEntry
   {- Arity: 1, Strictness: <S,1*U>,
@@ -252,13 +488,13 @@ f5555156e3fb30222eb79a5f627eefbf
 ecd0f9b9939553225d6cd79a948aca99
   listToHex_go :: [GHC.Word.Word8] -> [GHC.Types.Char]
   {- Arity: 1, Strictness: <S,1*U> -}
-ccf5a21413ac3ac89dcd4da2aa1cfeb9
+cbb1337b6942ac28221ad75ca1939de1
   lookUpIdxs ::
     [GHC.Types.Int] -> [[GHC.Word.Word16]] -> [GHC.Word.Word16]
   {- Arity: 2, Strictness: <S,1*U><L,U>,
      Unfolding: (\ idxs :: [GHC.Types.Int] lut :: [[GHC.Word.Word16]] ->
                  letrec {
-                   go :: [GHC.Types.Int] -> [GHC.Word.Word16]
+                   go6 :: [GHC.Types.Int] -> [GHC.Word.Word16]
                      {- Arity: 1, Strictness: <S,1*U> -}
                    = \ ds :: [GHC.Types.Int] ->
                      case ds of wild {
@@ -268,24 +504,44 @@ ccf5a21413ac3ac89dcd4da2aa1cfeb9
                           GHC.Base.++
                             @ GHC.Word.Word16
                             (GHC.List.$w!! @ [GHC.Word.Word16] lut ww1)
-                            (go ys) } }
+                            (go6 ys) } }
                  } in
-                 go idxs) -}
+                 go6 idxs) -}
 e2014d3aa42e2c6b1b9c0a57b0a42ee6
   lutEncodedOffset :: GHC.Int.Int64
   {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Int.I64# 142590) -}
-ee6590a2ab0ffaa5074d93f2d3fc4c03
+c0c956c71406d9cb335182d05c0e3cf9
   main :: GHC.Types.IO ()
   {- Arity: 1, Strictness: <L,U>,
      Unfolding: InlineRule (0, True, True)
                 Main.main1 `cast` (Sym (GHC.Types.NTCo:IO[0] <()>_R)) -}
-e3bd864fe81295cabb6b36ca45539f6f
+72c47377634a2c851da9a4c8ec9b7dbe
   main1 ::
     GHC.Prim.State# GHC.Prim.RealWorld
     -> (# GHC.Prim.State# GHC.Prim.RealWorld, () #)
-  {- Arity: 1, Strictness: <L,U> -}
-e0cb4c8d876273838c3b9b94e525a859
+  {- Arity: 1, Strictness: <L,U>,
+     Unfolding: (\ s :: GHC.Prim.State# GHC.Prim.RealWorld[OneShot] ->
+                 case System.Environment.getArgs2 s of ds1 { (#,#) ipv ipv1 ->
+                 case ipv1 of wild {
+                   GHC.Base.Nothing
+                   -> case GHC.Environment.getFullArgs1
+                             ipv of ds2 { (#,#) ipv2 ipv3 ->
+                      case System.Environment.dropRTSArgs ipv3 of wild1 {
+                        []
+                        -> case GHC.List.scanl2
+                           ret_ty (# GHC.Prim.State# GHC.Prim.RealWorld, () #)
+                           of {}
+                        : ds3 xs -> Main.main2 xs ipv2 } }
+                   GHC.Base.Just argv
+                   -> Main.main2 (GHC.List.tail @ GHC.Base.String argv) ipv } }) -}
+a57f186a8b3aee07f7a02ca2308bd280
   main2 ::
+    [[GHC.Types.Char]]
+    -> GHC.Prim.State# GHC.Prim.RealWorld
+    -> (# GHC.Prim.State# GHC.Prim.RealWorld, () #)
+  {- Arity: 2, Strictness: <S,1*U><L,U> -}
+cfcdb000fe362b230a763b48f3e448fa
+  main3 ::
     GHC.Prim.State# GHC.Prim.RealWorld
     -> (# GHC.Prim.State# GHC.Prim.RealWorld, () #)
   {- Arity: 1,
@@ -304,7 +560,83 @@ b0dd2b51a1e80bf513da7c6381e10517
                    (GHC.Prim.or#
                       (GHC.Prim.narrow16Word# (GHC.Prim.uncheckedShiftL# x# 8))
                       x#1) } }) -}
-879c6c7132626a4df138f181c40e7ad8
+7d4acb3c1467b57e9d6f062901805ef2
+  outVal :: Main.StreamCounter a -> GHC.Types.Int
+  RecSel Main.StreamCounter
+  {- Arity: 1, HasNoCafRefs, Strictness: <S(LLS),1*U(A,A,1*U(U))>,
+     Unfolding: InlineRule (1, True, False)
+                (\ @ a15 ds :: Main.StreamCounter a15 ->
+                 case ds of wild { Main.StreamCounter ds1 ds2 ds3 -> ds3 }) -}
+921a0aab372b651428709c8ca5e43c58
+  packCopyCommands :: [GHC.Word.Word8] -> [GHC.Word.Word8]
+  {- Arity: 1, HasNoCafRefs, Strictness: <S,U>m2, Inline: INLINE[0],
+     Unfolding: InlineRule (1, True, False)
+                (\ w :: [GHC.Word.Word8] ->
+                 case Main.$wpackCopyCommands w of ww { (#,#) ww1 ww2 ->
+                 GHC.Types.: @ GHC.Word.Word8 ww1 ww2 }) -}
+aa5ba812097c5707c32f7ace3d380b1d
+  readWords1 ::
+    Data.ByteString.Internal.ByteString
+    -> Data.Binary.Get.Internal.Success [GHC.Word.Word16] r
+    -> Data.Binary.Get.Internal.Decoder r
+  {- Arity: 2, Strictness: <S,1*U(U,U,U,U)><L,C(C1(U))>,
+     Inline: INLINE[0],
+     Unfolding: InlineRule (2, True, False)
+                (\ @ r
+                   w :: Data.ByteString.Internal.ByteString
+                   w1 :: Data.Binary.Get.Internal.Success [GHC.Word.Word16] r ->
+                 case w of ww { Data.ByteString.Internal.PS ww1 ww2 ww3 ww4 ->
+                 Main.$wa1 @ r ww1 ww2 ww3 ww4 w1 }) -}
+ef3ac4d51bba8df4fcf8bc84b7918085
+  readWords16 :: Data.Binary.Get.Internal.Get [GHC.Word.Word16]
+  {- Arity: 2, Strictness: <S,1*U(U,U,U,U)><L,C(C1(U))>,
+     Unfolding: InlineRule (0, True, True)
+                Main.readWords1
+                  `cast`
+                (Sym (Data.Binary.Get.Internal.NTCo:Get[0]
+                          <[GHC.Word.Word16]>_R)) -}
+1d46a4bdee5b404725b6ec5a8fefa79a
+  serialize :: [Main.RleEntry] -> [GHC.Word.Word8]
+  {- Arity: 1, HasNoCafRefs, Strictness: <S,1*U>m2,
+     Inline: INLINE[0],
+     Unfolding: InlineRule (1, True, False)
+                (\ w :: [Main.RleEntry] ->
+                 case Main.$wserialize w of ww { (#,#) ww1 ww2 ->
+                 GHC.Types.: @ GHC.Word.Word8 ww1 ww2 }) -}
+d8e82513b2cd5d835f9cf4ac6a3d745b
+  splitFromWord16 ::
+    [GHC.Word.Word16] -> ([GHC.Word.Word8], [GHC.Word.Word8])
+  {- Arity: 1, HasNoCafRefs, Strictness: <S,1*U>m, Inline: INLINE[0],
+     Unfolding: InlineRule (1, True, False)
+                (\ w :: [GHC.Word.Word16] ->
+                 case Main.$wsplitFromWord16 w of ww { (#,#) ww1 ww2 ->
+                 (ww1, ww2) }) -}
+f1940b5011cd097eef8c77e6789c761f
+  stream :: Main.StreamCounter a -> [a]
+  RecSel Main.StreamCounter
+  {- Arity: 1, HasNoCafRefs, Strictness: <S(SLL),1*U(1*U,A,A)>,
+     Unfolding: InlineRule (1, True, False)
+                (\ @ a15 ds :: Main.StreamCounter a15 ->
+                 case ds of wild { Main.StreamCounter ds1 ds2 ds3 -> ds1 }) -}
+999fca4da638721046f7ae7c25142c67
+  trimRlesLen :: [Main.RleEntry] -> [Main.RleEntry]
+  {- Arity: 1, HasNoCafRefs,
+     Unfolding: (Main.$sconcatMap
+                   @ Main.RleEntry
+                   @ Main.RleEntry
+                   Main.trimRlesLen_trimRleLen) -}
+a3eda6b1e5882a07913560e48a213d97
+  trimRlesLen_trimRleLen :: Main.RleEntry -> [Main.RleEntry]
+  {- Arity: 1, HasNoCafRefs, Strictness: <S,1*U>m2,
+     Inline: INLINE[0],
+     Unfolding: InlineRule (1, True, False)
+                (\ w :: Main.RleEntry ->
+                 case Main.$wtrimRleLen w of ww { (#,#) ww1 ww2 ->
+                 GHC.Types.: @ Main.RleEntry ww1 ww2 }) -}
+02666f70c8c82c98dc1f88d862a61980
+  unpackCopyCommands :: [GHC.Word.Word8] -> [GHC.Word.Word8]
+  {- Arity: 1, Strictness: <S,1*U> -}
+17eb3b9b3cd091d9ae2aad3d4cb98831
   val :: Main.RleEntry -> GHC.Word.Word8
   RecSel Main.RleEntry
   {- Arity: 1, Strictness: <S,1*U>,
@@ -315,7 +647,20 @@ b0dd2b51a1e80bf513da7c6381e10517
 48a1ee722addcfaa3bd77bc436c59385
   val1 :: GHC.Word.Word8
   {- Strictness: b -}
+instance GHC.Classes.Eq [Main.RleEntry] = Main.$fEqRleEntry
 instance GHC.Show.Show [Main.RleEntry] = Main.$fShowRleEntry
+"SPEC/Main $fEq[] @ Word16" [ALWAYS] forall $dEq :: GHC.Classes.Eq
+                                                      GHC.Word.Word16
+  GHC.Classes.$fEq[] @ GHC.Word.Word16 $dEq = Main.$s$fEq[]
+"SPEC/Main $fEq[]_$c/= @ Word16" [ALWAYS] forall $dEq :: GHC.Classes.Eq
+                                                           GHC.Word.Word16
+  GHC.Classes.$fEq[]_$c/= @ GHC.Word.Word16 $dEq
+  = Main.$s$fEq[]_$s$fEq[]_$c/=
+"SPEC/Main concatMap _ _ @ []" [ALWAYS] forall @ a15
+                                               @ b
+                                               $dFoldable :: Data.Foldable.Foldable []
+  Data.Foldable.concatMap @ a15 @ b @ [] $dFoldable
+  = Main.$sconcatMap @ a15 @ b
 vectorised variables:
 vectorised tycons:
 vectorised reused tycons:

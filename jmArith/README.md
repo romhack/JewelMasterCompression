@@ -5,7 +5,7 @@ Tile sets are compressed with [range encoding](https://en.wikipedia.org/wiki/Ran
 The following steps are used for decoding: 
 
 1. Read XOR flag and Size of unpacked data:
-3A600-3A601 first word: first bit is a xor or not-xor flag, rest 15 bits is a plain size of data / 8: counter is for longwords: 4 bytes, so minimal size is 4*8*1 = 32, i.e. 64 pixels - exactly 1 tile in 4bpp. 8118 means it will be xored unpack, 118 tiles will be unpacked
+3A600-3A601 first word (prt is stored at 0x1806): first bit is a xor or not-xor flag, rest 15 bits is a plain size of data / 8: counter is for longwords: 4 bytes, so minimal size is 4*8*1 = 32, i.e. 64 pixels - exactly 1 tile in 4bpp. 8118 means it will be xored unpack, 118 tiles will be unpacked
 
 2. Read and unpack LUT from 3A602-0x3A652. 
 Plain LUT structure: 16 bit word 
@@ -26,7 +26,7 @@ RLE Length can be maximum 8 pixes (zero-based 7 takes 3 bits, as it can be store
 5. XOR-decrypt unpacked data to plain tile map: first word32 is plain. XOR next encrypted word32 with previous plain word32, you get next plain word32. To XOR encrypt plain tile map, you just XOR previous plain word32 with next plain word32.
 
 ```
-Usage: habsentminded [-vde]
+Usage: jmArith [-vde]
   -d      decode from ROM
   -e      encode from binary file
   -v      show version number

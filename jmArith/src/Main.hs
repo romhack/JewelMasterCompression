@@ -1,9 +1,11 @@
 module Main where
 import           Control.Monad.State
 import           Data.Binary.Get
+import           Data.Binary.Put
 import           Data.Bits
 import qualified Data.Bitstream.Lazy  as Bi
 import qualified Data.ByteString.Lazy as Bs
+import           Data.Int
 import           Data.List            (foldl', group, sortBy)
 import           Data.List.Split
 import qualified Data.Map.Strict      as M
@@ -12,7 +14,7 @@ import           Data.Ord             (comparing)
 import           Data.Word
 import           System.Environment
 
-data LutEntry = LutEntry {bitLen:: Word8, rleCount:: Word8, rleData:: Word8}
+data LutEntry = LutEntry  {bitLen:: Word8, rleCount:: Word8, rleData:: Word8}
   deriving (Show)
 type LutMap = M.Map Word8 LutEntry --map with offsets in LUT as keys and LutEntries as entries
 type EncodeDictionary = M.Map RleEntry [Bool] --reverse map for encoding: value is actual entry code
@@ -21,9 +23,10 @@ data RleEntry = Code {len:: Int, val:: Word8} --zero len means 1 raw byte
   deriving (Show, Eq, Ord)
 
 data StreamCounter a = StreamCounter {stream :: [a], inVal :: Word8, outVal :: Int} --stream with statistics embedded
-
+gfxOffset :: Int64
 gfxOffset = 0x3A600
-lutEntriesCount = 252 :: Int--252 entries are in LUT: last 4 entries for extra entries
+lutEntriesCount :: Int
+lutEntriesCount = 252 --252 entries are in LUT: last 4 entries for extra entries
 
 fillLut :: State (StreamCounter Word8) LutMap --parse LUT from serialized view
 fillLut = do
@@ -33,7 +36,9 @@ fillLut = do
     (0xFF:_) -> do --end of LUT byte reached
       put $ StreamCounter [] 0 (outVal s + 1) --only outval counter needed in return state
       return M.empty
-    (a:b:c:stream) -> do
+    [_] -> error "Unexpected input stream end in next LUT entry read"
+    [_, _] -> error "Unexpected input stream end in next LUT entry read"
+    (a:b:c:strm) -> do
       let
         hiNybble x = (x `shiftR` 4) .&. 0xF
         loNybble x = x .&. 0xF
@@ -41,11 +46,11 @@ fillLut = do
         pixVal = inVal s
         outCount = outVal s
       if a < 0x80 then do --old pixel value will be used
-        put $ StreamCounter (c: stream) pixVal (outCount + 2)
+        put $ StreamCounter (c: strm) pixVal (outCount + 2)
         rest <- fillLut
         return $ M.insert (offs b (loNybble a)) LutEntry {bitLen = loNybble a, rleCount = hiNybble a, rleData = pixVal} rest
       else do --read and use new pixel value
-        put $ StreamCounter stream (loNybble a) (outCount + 3)
+        put $ StreamCounter strm (loNybble a) (outCount + 3)
         rest <- fillLut
         return $ M.insert (offs c (loNybble b)) LutEntry {bitLen = loNybble b, rleCount = hiNybble b, rleData = loNybble a} rest
 
@@ -113,17 +118,18 @@ histogram xs = swap . M.toList $ M.fromListWith (+) [(c, 1) | c <- xs]
 
 getProbability :: Int -> Int -> Int --nearest 2^n value for lut entry size in given entry probability weight
 getProbability weight total
-  | p < 1 = 0 --less than 1 entry will be encoded by raw entry bits in encoded stream
-  | round p <= 2 = round p --for 1 and 2
+  | p < 1 = 0 --less than 1 entry will be encoded by raw entry bits in encoded strm
+  | roundedP <= 2 = roundedP --for 1 and 2
   | otherwise = roundToPower2 p
   where
     p = (fromIntegral weight / fromIntegral total) * fromIntegral lutEntriesCount
+    roundedP = round p :: Int
     roundToPower2 :: Double -> Int --rounds number to closest 2^n
     roundToPower2 x = if (x - fromIntegral pre) > (fromIntegral suc - x) then suc else pre
       where
-        bitSize = floor (logBase 2 x)--calc how much bits int value takes
-        pre = 2^bitSize
-        suc = 2^(bitSize + 1)
+        bitSz = floor (logBase 2 x) :: Int--calc how much bits int value takes
+        pre = 2^bitSz
+        suc = 2^(bitSz + 1)
 
 buildLutMapEncode :: [(Int, RleEntry)] -> LutMap --build a proper lut map from histogarm for seriaization
 buildLutMapEncode xs = go lutEntries 0 --second param for offset tracking
@@ -135,22 +141,23 @@ buildLutMapEncode xs = go lutEntries 0 --second param for offset tracking
       where offs = count + (2 ^ (8-b))
     lutEntries = map histToLutEntry xs
     histToLutEntry :: (Int, RleEntry) -> LutEntry
-    histToLutEntry (c, Code l v) = LutEntry {bitLen = 8 - round (logBase 2 (fromIntegral c)), rleCount = fromIntegral l, rleData = v}
+    histToLutEntry (c, Code l v) = LutEntry {bitLen = 8 - round bitsFractional, rleCount = fromIntegral l, rleData = v}
+      where bitsFractional = logBase 2 (fromIntegral c) :: Double
 
 
 serializeLutMap :: LutMap -> [Word8] --convert LUT to game's format
-serializeLutMap m = serialize 0xFF sortedByData --sort entries by pixvalues and serialize
+serializeLutMap m = serializeMap 0xFF sortedByData --sort entries by pixvalues and serialize
   where -- 0xFF is a pixvalue, which just intis and never equal to real pixvalue, which is 4 bits
     sortedByData = sortBy (comparing (rleData.snd)) $ M.toList m
-    serialize :: Word8 -> [(Word8, LutEntry)] -> [Word8]
-    serialize _ [] = [0xFF] --lut is terminated by FF
-    serialize pixVal ((offs, LutEntry bLen rCount rData) : es)
-      | rData /= pixVal = [0x80 .|. rData, (rCount `shiftL` 4) .|. bLen, slotNum] ++ serialize rData es --new pix value
-      | otherwise = [(rCount `shiftL` 4) .|. bLen, slotNum] ++ serialize pixVal es
+    serializeMap :: Word8 -> [(Word8, LutEntry)] -> [Word8]
+    serializeMap _ [] = [0xFF] --lut is terminated by FF
+    serializeMap pixVal ((offs, LutEntry bLen rCount rData) : es)
+      | rData /= pixVal = [0x80 .|. rData, (rCount `shiftL` 4) .|. bLen, slotNum] ++ serializeMap rData es --new pix value
+      | otherwise = [(rCount `shiftL` 4) .|. bLen, slotNum] ++ serializeMap pixVal es
       where slotNum = offs `shiftR` fromIntegral (8 - bLen)
 
 
-buildEncodeDictionary :: LutMap -> EncodeDictionary --convert lut to encoding dictionary
+buildEncodeDictionary ::  LutMap -> EncodeDictionary --convert lut to encoding dictionary
 buildEncodeDictionary m = go (M.toList m)
   where
     go :: [(Word8, LutEntry)] -> EncodeDictionary
@@ -163,49 +170,52 @@ buildEncodeDictionary m = go (M.toList m)
 serialize :: EncodeDictionary -> [RleEntry] -> [Bool] --build a bool stream by the dictionary
 serialize dict = concatMap getCode
   where
-  getCode e@(Code l v) = case M.lookup e dict of
+  getCode e@(Code l v) =  case M.lookup e dict of
     Just code -> code
     Nothing -> [True, True, True, True, True, True] ++ numToBits 3 l ++ numToBits 4 v --code not found, inject raw in bitstream
 
 
-  ----------------------------ENCODE
+  ----------------------------MAIN
 main :: IO()
 main = getArgs >>= parse
-parse ["-v"] = putStrLn "jmArith compression tool 0.1"
-parse ["-d"] = decodeFile
-parse ["-e"] = encodeFile
-parse _ = putStrLn "Usage: jmArith [-vde]"
+  where
+    parse ["-v"] = putStrLn "jmArith compression tool 0.1"
+    parse ["-d"] = decodeFile
+    parse ["-e"] = encodeFile
+    parse _ = putStrLn "Usage: jmArith [-vde]"
 
-decodeFile = do
-  input <- Bs.readFile "Jewel Master (UE) [!].bin"
-  let
-    gfxPixSize = if sizeWord < 0x8000
-      then error "Not-encrypted scheme not implemented" --hibit is a xor-encryption flag
-      else fromIntegral (sizeWord .&. 0x7FFF) * 8 * 8 --tile count * tile size in pixels
-      where sizeWord = runGet getWord16be $ Bs.drop gfxOffset input
-    lutSerialized = Bs.unpack $ Bs.drop (gfxOffset + 2) input --LUT is right after size word
-    (lut, st) = runState fillLut $ StreamCounter lutSerialized 0 0
-    gfxEncodedOffset = gfxOffset + 2 + fromIntegral (outVal st) --compressed stream right after LUT
-    encodedStream = toBoolStream $ Bs.drop gfxEncodedOffset input
-    rleEntries = deserialize lut encodedStream
-    decoded = decode gfxPixSize rleEntries
-    decodedDecrypted = xorDecrypt $ mergeNybbles decoded
-  Bs.writeFile "decoded.bin" $ Bs.pack decodedDecrypted
+    decodeFile = do
+      input <- Bs.readFile "Jewel Master (UE) [!].bin"
+      let
+        gfxPixSize = if sizeWord < 0x8000
+          then error "Not-encrypted scheme not implemented" --hibit is a xor-encryption flag
+          else fromIntegral (sizeWord .&. 0x7FFF) * 8 * 8 --tile count * tile size in pixels
+          where sizeWord = runGet getWord16be $ Bs.drop gfxOffset input
+        lutSerialized = Bs.unpack $ Bs.drop (gfxOffset + 2) input --LUT is right after size word
+        (lut, st) = runState fillLut $ StreamCounter lutSerialized 0 0
+        gfxEncodedOffset = gfxOffset + 2 + fromIntegral (outVal st) --compressed stream right after LUT
+        encodedStream = toBoolStream $ Bs.drop gfxEncodedOffset input
+        rleEntries = deserialize lut encodedStream
+        decoded = decode gfxPixSize rleEntries
+        decodedDecrypted = xorDecrypt $ mergeNybbles decoded
+      Bs.writeFile "decoded.bin" $ Bs.pack decodedDecrypted
 
 
-encodeFile = do
-  input <- Bs.readFile "decoded.bin"
-  let
-    decodedEncrypted = xorEncrypt $ Bs.unpack input
-    decodedEncryptedPixels = splitNybbles decodedEncrypted
-    encoded = trimRlesLen $ encode decodedEncryptedPixels
-    histogramSorted = sortBy (flip compare) $ histogram encoded
-    --convert frequencies in histogram to range probabilities:
-    --252 entries in LUT (last 4 entries for expansion). Total entries count is length of encoded entries list.
-    histogramRanges = map (\(a,b) -> (getProbability a (length encoded), b)) histogramSorted
-    lutEncode = buildLutMapEncode histogramRanges --build new lut for encoding
-    lutMapSerialized = serializeLutMap lutEncode
-    encodeDictionary = buildEncodeDictionary lutEncode
-    encodedStream = serialize encodeDictionary encoded
-  --append lut and encoded stream in one block for further ROM insert
-  Bs.writeFile "encoded.bin" $ Bs.append (Bs.pack lutMapSerialized) (Bi.toByteString $ toBitStream encodedStream)
+    encodeFile = do
+      input <- Bs.readFile "decoded.bin"
+      let
+        decodedEncrypted = xorEncrypt $ Bs.unpack input
+        decodedEncryptedPixels = splitNybbles decodedEncrypted
+        encoded = trimRlesLen $ encode decodedEncryptedPixels
+        histogramSorted = sortBy (flip compare) $ histogram encoded
+        --convert frequencies in histogram to range probabilities:
+        --252 entries in LUT (last 4 entries for expansion). Total entries count is length of encoded entries list.
+        histogramRanges = map (\(a,b) -> (getProbability a (length encoded), b)) histogramSorted
+        lutEncode = buildLutMapEncode histogramRanges --build new lut for encoding
+        sizeWord = (Bs.length input `shiftR` 5) .|. 0x8000 -- get tiles count from gfx size OR encryption flag
+        sizeWordBs = runPut $ putWord16be (fromIntegral sizeWord)
+        lutMapSerialized = serializeLutMap lutEncode
+        encodeDictionary = buildEncodeDictionary lutEncode
+        encodedStream = serialize encodeDictionary encoded
+      --append lut and encoded stream in one block for further ROM insert
+      Bs.writeFile "encoded.bin" $ Bs.concat [sizeWordBs, Bs.pack lutMapSerialized, Bi.toByteString $ toBitStream encodedStream]

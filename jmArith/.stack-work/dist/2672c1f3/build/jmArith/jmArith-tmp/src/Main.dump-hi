@@ -1,11 +1,11 @@
 
 ==================== FINAL INTERFACE ====================
-2016-05-14 15:56:26.9502222 UTC
+2016-06-27 18:00:43.2602443 UTC
 
 interface main@main:Main 7103
-  interface hash: a6c7f9c0627bbb5954b924b3f486f666
-  ABI hash: 5c2fbe40c5d38491bde62ce1b7a0fa80
-  export-list hash: 4aea30e8111100418a9c627034ff90c3
+  interface hash: 46828d48f3c16d82d8a5ea842123196b
+  ABI hash: 4ad51c687128af0bd709a410821523bd
+  export-list hash: 265c977bbf5f0084575ad91b1f2bce29
   orphan hash: aa551dc51c40f55046fb8166241b48bf
   flag hash: 989d7567c2a4235d3a2ce5e5716544db
   sig of: Nothing
@@ -16,10 +16,8 @@ exports:
   Main.buildEncodeDictionary
   Main.buildLutMapEncode
   Main.decode
-  Main.decodeFile
   Main.deserialize
   Main.encode
-  Main.encodeFile
   Main.fillLut
   Main.getProbability
   Main.gfxOffset
@@ -28,7 +26,6 @@ exports:
   Main.main
   Main.mergeNybbles
   Main.numToBits
-  Main.parse
   Main.serialize
   Main.serializeLutMap
   Main.splitNybbles
@@ -70,6 +67,7 @@ family instance modules: base-4.8.2.0:Control.Applicative
                          vector-0.10.12.3@vecto_Hlsuo0rfZGxDZa3vCL7yzy:Data.Vector.Storable
 import  -/  base-4.8.2.0:Data.Bits 87f514c5f0e66e224843da33c04aa38b
 import  -/  base-4.8.2.0:Data.Foldable 2ce969969ad5231eb40bd713f94f05ad
+import  -/  base-4.8.2.0:Data.Int 1419fa899a36eeb2bd16fdb7f0a89738
 import  -/  base-4.8.2.0:Data.List 3f0782c8d4bf50eecefcd5ea1798aac8
 import  -/  base-4.8.2.0:Data.Maybe 1cb58de2b04ee3c0c0a7dc9201184aff
 import  -/  base-4.8.2.0:Data.OldList d8fd80b0e14aa085ce6219cd89dad356
@@ -78,6 +76,7 @@ import  -/  base-4.8.2.0:Data.Tuple 012ad951a59a9d85fe1de36a2f012986
 import  -/  base-4.8.2.0:Data.Word ec8deb535202352cc8b509b14004bcbd
 import  -/  base-4.8.2.0:GHC.Base a4939789b2cfd60b36ed163e56a623cd
 import  -/  base-4.8.2.0:GHC.Float e532d434ec2447d809887c0fca1d78a5
+import  -/  base-4.8.2.0:GHC.Int 28d8a9f7cfc272358fb4631d98c579ce
 import  -/  base-4.8.2.0:GHC.List 0c736920522bbd14b770342776012ab6
 import  -/  base-4.8.2.0:GHC.Num 9f42750c866f5832ca565146bd660c60
 import  -/  base-4.8.2.0:GHC.Real 1281efa9baf803bc7859d7efb89a38b3
@@ -87,6 +86,7 @@ import  -/  base-4.8.2.0:Prelude 694dcaf039efe62df1c44834e2dbd2fb
 import  -/  base-4.8.2.0:System.Environment c73e1b71c29d9e28d4cdf8209f2f1559
 import  -/  base-4.8.2.0:System.IO 638c10c4fd4901a0aca5b77c9f14123d
 import  -/  binary-0.7.5.0@binar_3uXFWMoAGBg0xKP9MHKRwi:Data.Binary.Get f87c878c97e7480a92e049b12d3a9019
+import  -/  binary-0.7.5.0@binar_3uXFWMoAGBg0xKP9MHKRwi:Data.Binary.Put 3105ee566a5c25103f6c0c5075957d76
 import  -/  bitstream-0.2.0.4@bitst_BQbLuh1SAyZJZAeLVOmcbb:Data.Bitstream.Generic 39a6b796feff3070e35ab70db4d7b386
 import  -/  bitstream-0.2.0.4@bitst_BQbLuh1SAyZJZAeLVOmcbb:Data.Bitstream.Lazy 40fc5880692d139a37dde6f8a6e58b25
 import  -/  bitstream-0.2.0.4@bitst_BQbLuh1SAyZJZAeLVOmcbb:Data.Bitstream.Packet 45e0b91d5eba71b4ab323d748f0ddded
@@ -378,12 +378,6 @@ cdab06891c26fc2e11afd700e725d743
                  case w of ww { GHC.Types.I# ww1 ->
                  case w1 of ww2 { Main.Code ww3 ww4 ->
                  Main.$w$cshowsPrec1 ww1 ww3 ww4 w2 } }) -}
-63f570632948f8ec01c0d1dff1553fc7
-  $s^3 :: GHC.Types.Int
-  {- Strictness: b -}
-eae245ebc21f9837b2bc94b8da365834
-  $s^4 :: GHC.Integer.Type.Integer
-  {- HasNoCafRefs, Unfolding: (__integer 0) -}
 b8f2d02f49c6d75ec6b80e7ddf31261b
   $sconcatMap :: (a3 -> [b]) -> [a3] -> [b]
   {- Arity: 2, HasNoCafRefs, Strictness: <L,C(U)><S,1*U>,
@@ -772,21 +766,6 @@ c02802f3f4659e60560123b74726d71b
                            @ GHC.Types.Char
                            Main.$fShowRleEntry2
                            (g1 (GHC.Types.: @ GHC.Types.Char GHC.Show.shows8 w))) }) -}
-07ba4259c72577e1b398fc05f48f4818
-  $w$s^ :: GHC.Types.Int -> GHC.Integer.Type.Integer -> GHC.Prim.Int#
-  {- Arity: 2, Strictness: <L,U(U)><S,U>, Inline: [0],
-     Unfolding: (\ w :: GHC.Types.Int w1 :: GHC.Integer.Type.Integer ->
-                 case GHC.Integer.Type.ltInteger# w1 Main.$s^4 of wild { DEFAULT ->
-                 case GHC.Prim.tagToEnum# @ GHC.Types.Bool wild of wild1 {
-                   GHC.Types.False
-                   -> case GHC.Integer.Type.eqInteger#
-                             w1
-                             Main.$s^4 of wild2 { DEFAULT ->
-                      case GHC.Prim.tagToEnum# @ GHC.Types.Bool wild2 of wild3 {
-                        GHC.Types.False
-                        -> case w of ww { GHC.Types.I# ww1 -> Main.$wf1 ww1 w1 }
-                        GHC.Types.True -> 1 } }
-                   GHC.Types.True -> case Main.$s^3 ret_ty GHC.Prim.Int# of {} } }) -}
 f8fe3c7a3e9c440ee55e200fcc0f7ddb
   $w$sgo1 ::
     GHC.Types.Int
@@ -821,26 +800,104 @@ cb93fec20b3825b3956a53bacec5e129
     -> GHC.Types.Int
     -> (# Main.LutMap, Main.StreamCounter GHC.Word.Word8 #)
   {- Arity: 3, Strictness: <S,1*U><L,U><L,1*U(U)>, Inline: [0] -}
-f064b76c6cd79687ebd7bb6caa4c635b
-  $wa1 ::
-    GHC.Prim.State# GHC.Prim.RealWorld
-    -> (# GHC.Prim.State# GHC.Prim.RealWorld, () #)
-  {- Arity: 1, Strictness: <L,U>, Inline: [0],
-     Unfolding: (\ w :: GHC.Prim.State# GHC.Prim.RealWorld[OneShot] ->
-                 GHC.IO.Handle.Text.hPutStr2
-                   GHC.IO.Handle.FD.stdout
-                   Main.main7
-                   GHC.Types.True
-                   w) -}
 21c36182631397a2995231027affc17e
   $wf :: GHC.Prim.Word# -> GHC.Prim.Word# -> GHC.Prim.Word#
   {- Arity: 2, Strictness: <L,U><L,U>, Inline: [0] -}
-f4e8a3ff12bef11f9bd94f309e24b482
-  $wf1 :: GHC.Prim.Int# -> GHC.Integer.Type.Integer -> GHC.Prim.Int#
-  {- Arity: 2, Strictness: <L,U><L,U>, Inline: [0] -}
-c9a5e5b45f94f90ff1e29d7475043175
-  $wgetProbability :: GHC.Prim.Int# -> GHC.Prim.Int# -> GHC.Prim.Int#
-  {- Arity: 2, Strictness: <L,U><L,U>, Inline: [0] -}
+bee59ec7e96692c1a2522467c0d906ac
+  $wgetProbability :: GHC.Prim.Int# -> GHC.Prim.Int# -> GHC.Types.Int
+  {- Arity: 2, Strictness: <L,U><L,U>, Inline: [0],
+     Unfolding: (\ ww :: GHC.Prim.Int# ww1 :: GHC.Prim.Int# ->
+                 case GHC.Prim./##
+                        (GHC.Prim.int2Double# ww)
+                        (GHC.Prim.int2Double# ww1) of wild2 { DEFAULT ->
+                 let {
+                   x :: GHC.Prim.Double# = GHC.Prim.*## wild2 252.0
+                 } in
+                 case GHC.Prim.tagToEnum#
+                        @ GHC.Types.Bool
+                        (GHC.Prim.<## x 1.0) of wild {
+                   GHC.Types.False
+                   -> case {__pkg_ccall base-4.8.2.0 rintDouble GHC.Prim.Double#
+                                                                -> GHC.Prim.State#
+                                                                     GHC.Prim.RealWorld
+                                                                -> (# GHC.Prim.State#
+                                                                        GHC.Prim.RealWorld,
+                                                                      GHC.Prim.Double# #)}
+                             x
+                             GHC.Prim.realWorld# of wild1 { (#,#) ds2 ds3 ->
+                      let {
+                        x1 :: GHC.Prim.Int# = GHC.Prim.double2Int# ds3
+                      } in
+                      case GHC.Prim.tagToEnum#
+                             @ GHC.Types.Bool
+                             (GHC.Prim.<=# x1 2) of wild3 {
+                        GHC.Types.False
+                        -> case GHC.Prim.logDouble# x of wild4 { DEFAULT ->
+                           case GHC.Prim.logDouble# 2.0 of wild5 { DEFAULT ->
+                           case GHC.Prim./## wild4 wild5 of wild6 { DEFAULT ->
+                           let {
+                             n :: GHC.Prim.Int# = GHC.Prim.double2Int# wild6
+                           } in
+                           let {
+                             $w$j :: GHC.Prim.Int# -> GHC.Types.Int
+                               {- Arity: 1, Strictness: <S,U>, Inline: [0] -}
+                             = \ w :: GHC.Prim.Int#[OneShot] ->
+                               case GHC.Prim.tagToEnum#
+                                      @ GHC.Types.Bool
+                                      (GHC.Prim.<# w 0) of wild7 {
+                                 GHC.Types.False
+                                 -> let {
+                                      $j :: GHC.Prim.Int# -> GHC.Types.Int -> GHC.Types.Int
+                                        {- Arity: 2, Strictness: <L,U><L,1*U(U)> -}
+                                      = \ i :: GHC.Prim.Int#[OneShot]
+                                          wild8 :: GHC.Types.Int[OneShot] ->
+                                        let {
+                                          x2 :: GHC.Prim.Int# = GHC.Prim.+# w 1
+                                        } in
+                                        case GHC.Prim.tagToEnum#
+                                               @ GHC.Types.Bool
+                                               (GHC.Prim.<# x2 0) of wild9 {
+                                          GHC.Types.False
+                                          -> case x2 of wild10 {
+                                               DEFAULT
+                                               -> case GHC.Real.$wf1 2 wild10 of ww4 { DEFAULT ->
+                                                  case GHC.Prim.tagToEnum#
+                                                         @ GHC.Types.Bool
+                                                         (GHC.Prim.>##
+                                                            (GHC.Prim.-##
+                                                               x
+                                                               (GHC.Prim.int2Double# i))
+                                                            (GHC.Prim.-##
+                                                               (GHC.Prim.int2Double# ww4)
+                                                               x)) of wild11 {
+                                                    GHC.Types.False -> wild8
+                                                    GHC.Types.True -> GHC.Types.I# ww4 } }
+                                               0
+                                               -> case GHC.Prim.tagToEnum#
+                                                         @ GHC.Types.Bool
+                                                         (GHC.Prim.>##
+                                                            (GHC.Prim.-##
+                                                               x
+                                                               (GHC.Prim.int2Double# i))
+                                                            (GHC.Prim.-## 1.0 x)) of wild11 {
+                                                    GHC.Types.False -> wild8
+                                                    GHC.Types.True -> GHC.Real.^3 } }
+                                          GHC.Types.True -> GHC.Real.^2 }
+                                    } in
+                                    case w of wild8 {
+                                      DEFAULT
+                                      -> case GHC.Real.$wf1 2 wild8 of ww4 { DEFAULT ->
+                                         $j ww4 (GHC.Types.I# ww4) }
+                                      0 -> $j 1 GHC.Real.^3 }
+                                 GHC.Types.True -> GHC.Real.^2 }
+                           } in
+                           case GHC.Prim.tagToEnum#
+                                  @ GHC.Types.Bool
+                                  (GHC.Prim.<## wild6 (GHC.Prim.int2Double# n)) of wild7 {
+                             GHC.Types.False -> $w$j n
+                             GHC.Types.True -> $w$j (GHC.Prim.-# n 1) } } } }
+                        GHC.Types.True -> GHC.Types.I# x1 } }
+                   GHC.Types.True -> Main.bitsToNum3 } }) -}
 4b1c4b91147827fc228bdfeb526353a3
   $wlvl :: GHC.Prim.Word# -> GHC.Prim.Word# -> GHC.Types.Ordering
   {- Arity: 2, HasNoCafRefs, Strictness: <L,U><L,U>, Inline: [0],
@@ -915,8 +972,8 @@ b8c1410f557195b36828c559763216b3
     -> Data.Map.Base.Map GHC.Word.Word8 v
     -> GHC.Base.Maybe (GHC.Word.Word8, v)
   {- Arity: 2, HasNoCafRefs, Strictness: <L,U><S,1*U>, Inline: [0] -}
-b2d2f6098b8cc2a40b885cbbebeb95f3
-  $wserialize ::
+16defde1041769e97cb403340eb9f96e
+  $wserializeMap ::
     GHC.Word.Word8
     -> [(GHC.Word.Word8, Main.LutEntry)]
     -> (# GHC.Word.Word8, [GHC.Word.Word8] #)
@@ -951,19 +1008,19 @@ cdab06891c26fc2e11afd700e725d743
      Unfolding: InlineRule (1, True, False)
                 (\ ds :: Main.LutEntry ->
                  case ds of wild { Main.LutEntry ds1 ds2 ds3 -> ds1 }) -}
-9021d20a417f64009af38e8c9219bba9
+714028f7bb0fe7dea71acdaffdd8e6ea
   bitsToNum :: GHC.Num.Num a => [GHC.Types.Bool] -> a
   {- Arity: 1, HasNoCafRefs,
      Strictness: <L,U(C(C1(U)),A,C(C1(U)),A,A,A,C(U))>,
      Unfolding: (\ @ a9 $dNum :: GHC.Num.Num a9 ->
                  let {
-                   lvl16 :: a9 = GHC.Num.fromInteger @ a9 $dNum Main.bitsToNum6
+                   lvl30 :: a9 = GHC.Num.fromInteger @ a9 $dNum Main.bitsToNum7
                  } in
                  let {
-                   lvl17 :: a9 = GHC.Num.fromInteger @ a9 $dNum Main.$s^4
+                   lvl31 :: a9 = GHC.Num.fromInteger @ a9 $dNum Main.bitsToNum6
                  } in
                  let {
-                   lvl18 :: a9 = GHC.Num.fromInteger @ a9 $dNum Main.bitsToNum5
+                   lvl32 :: a9 = GHC.Num.fromInteger @ a9 $dNum Main.bitsToNum5
                  } in
                  GHC.List.foldl'
                    @ GHC.Types.Bool
@@ -972,10 +1029,10 @@ cdab06891c26fc2e11afd700e725d743
                     GHC.Num.+
                       @ a9
                       $dNum
-                      (GHC.Num.* @ a9 $dNum byte lvl16)
+                      (GHC.Num.* @ a9 $dNum byte lvl30)
                       (case b of wild {
-                         GHC.Types.False -> lvl17 GHC.Types.True -> lvl18 }))
-                   lvl17) -}
+                         GHC.Types.False -> lvl31 GHC.Types.True -> lvl32 }))
+                   lvl31) -}
 e7565e0c6a5c117e539d53ce45d3b3f5
   bitsToNum1 :: GHC.Word.Word8
   {- HasNoCafRefs, Strictness: m,
@@ -986,8 +1043,11 @@ e7565e0c6a5c117e539d53ce45d3b3f5
 cbc3ae2a1b21404ac2f74dae0d247eb3
   bitsToNum5 :: GHC.Integer.Type.Integer
   {- HasNoCafRefs, Unfolding: (__integer 1) -}
-4dd261cabc4519d9bd2887222ea09ca4
+aa18b5cc4ac902be2ed97850fa19b7d3
   bitsToNum6 :: GHC.Integer.Type.Integer
+  {- HasNoCafRefs, Unfolding: (__integer 0) -}
+0d425216d8ae6c1b14d2150215aa4216
+  bitsToNum7 :: GHC.Integer.Type.Integer
   {- HasNoCafRefs, Unfolding: (__integer 2) -}
 b5c8c118abeb20c71e66f59947549525
   buildEncodeDictionary :: Main.LutMap -> Main.EncodeDictionary
@@ -1075,240 +1135,6 @@ a49b2617675c14b7c2ac7f6f4184f0cb
 175008ea788a6bb8609f063d1ef4344f
   decode :: GHC.Types.Int -> [Main.RleEntry] -> [GHC.Word.Word8]
   {- Arity: 2, HasNoCafRefs, Strictness: <L,1*U(U)><S,1*U> -}
-cf7d09d63d82f30de4c8442808bf7aa1
-  decodeFile :: GHC.Types.IO ()
-  {- Arity: 1, Strictness: <L,U>,
-     Unfolding: InlineRule (0, True, True)
-                Main.decodeFile1 `cast` (Sym (GHC.Types.NTCo:IO[0] <()>_R)) -}
-d2f952db3d238fc9f3abeaa15c53d4ee
-  decodeFile1 ::
-    GHC.Prim.State# GHC.Prim.RealWorld
-    -> (# GHC.Prim.State# GHC.Prim.RealWorld, () #)
-  {- Arity: 1, Strictness: <L,U>,
-     Unfolding: (\ s :: GHC.Prim.State# GHC.Prim.RealWorld[OneShot] ->
-                 case GHC.IO.Handle.FD.openBinaryFile1
-                        Main.decodeFile13
-                        GHC.IO.IOMode.ReadMode
-                        s of ds1 { (#,#) ipv ipv1 ->
-                 case Data.ByteString.Lazy.getContents2
-                        ipv1
-                        ipv of ds2 { (#,#) ipv2 ipv3 ->
-                 let {
-                   a9 :: Data.Functor.Identity.Identity
-                           (Main.LutMap, Main.StreamCounter GHC.Word.Word8)
-                   = case Main.$wa
-                            (Data.ByteString.Lazy.Internal.unpackBytes
-                               (Data.ByteString.Lazy.$wdrop' 239106 ipv3))
-                            Main.bitsToNum1
-                            Main.bitsToNum3 of ww { (#,#) ww1 ww2 ->
-                     (ww1, ww2)
-                       `cast`
-                     (Sym (Data.Functor.Identity.NTCo:Identity[0]
-                               <(Main.LutMap, Main.StreamCounter GHC.Word.Word8)>_R)) }
-                 } in
-                 Control.Exception.Base.bracket1
-                   @ GHC.IO.Handle.Types.Handle
-                   @ ()
-                   @ ()
-                   Main.decodeFile11
-                     `cast`
-                   (Sym (GHC.Types.NTCo:IO[0] <GHC.IO.Handle.Types.Handle>_R))
-                   GHC.IO.Handle.hClose1
-                     `cast`
-                   (<GHC.IO.Handle.Types.Handle>_R
-                    ->_R Sym (GHC.Types.NTCo:IO[0] <()>_R))
-                   (\ hdl :: GHC.IO.Handle.Types.Handle[OneShot]
-                      eta1 :: GHC.Prim.State# GHC.Prim.RealWorld[OneShot] ->
-                    Data.ByteString.Lazy.appendFile2
-                      hdl
-                      (Data.ByteString.Lazy.Internal.packBytes_$spackChunks
-                         32
-                         (Main.xorDecrypt
-                            (Main.mergeNybbles
-                               (Main.decode
-                                  (case Data.Binary.Get.runGet1
-                                          @ GHC.Word.Word16
-                                          Main.decodeFile3
-                                          (Data.ByteString.Lazy.$wdrop'
-                                             239104
-                                             ipv3) of wild { GHC.Word.W16# a10 ->
-                                   case GHC.Prim.tagToEnum#
-                                          @ GHC.Types.Bool
-                                          (GHC.Prim.ltWord# a10 __word 32768) of wild1 {
-                                     GHC.Types.False
-                                     -> GHC.Types.I#
-                                          (GHC.Prim.*#
-                                             (GHC.Prim.*#
-                                                (GHC.Prim.word2Int#
-                                                   (GHC.Prim.and# a10 __word 32767))
-                                                8)
-                                             8)
-                                     GHC.Types.True -> Main.decodeFile2 } })
-                                  (Main.deserialize
-                                     (case a9
-                                             `cast`
-                                           (Data.Functor.Identity.NTCo:Identity[0]
-                                                <(Main.LutMap,
-                                                  Main.StreamCounter
-                                                    GHC.Word.Word8)>_R) of wild { (,) lut st ->
-                                      lut })
-                                     (Main.toBoolStream
-                                        (case a9
-                                                `cast`
-                                              (Data.Functor.Identity.NTCo:Identity[0]
-                                                   <(Main.LutMap,
-                                                     Main.StreamCounter
-                                                       GHC.Word.Word8)>_R) of wild { (,) lut st ->
-                                         case st of wild1 { Main.StreamCounter ds ds3 ds4 ->
-                                         case ds4 of wild2 { GHC.Types.I# x# ->
-                                         let {
-                                           a10 :: GHC.Prim.Int# = GHC.Prim.+# 239106 x#
-                                         } in
-                                         case GHC.Prim.tagToEnum#
-                                                @ GHC.Types.Bool
-                                                (GHC.Prim.<=# a10 0) of wild3 {
-                                           GHC.Types.False -> Data.ByteString.Lazy.$wdrop' a10 ipv3
-                                           GHC.Types.True -> ipv3 } } } })))))))
-                      eta1)
-                     `cast`
-                   (<GHC.IO.Handle.Types.Handle>_R
-                    ->_R Sym (GHC.Types.NTCo:IO[0] <()>_R))
-                   ipv2 } }) -}
-c8e3cb0946c701cdd12efe6b54a8fb41
-  decodeFile10 :: GHC.Types.Int
-  {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Types.I# 2) -}
-2edd52b31d6c3d15f264ac547ad4db0e
-  decodeFile11 ::
-    GHC.Prim.State# GHC.Prim.RealWorld
-    -> (# GHC.Prim.State# GHC.Prim.RealWorld,
-          GHC.IO.Handle.Types.Handle #)
-  {- Arity: 1,
-     Unfolding: (GHC.IO.Handle.FD.openBinaryFile1
-                   Main.decodeFile12
-                   GHC.IO.IOMode.WriteMode) -}
-6b1ee5d2fddba72a95f7ded5d845e125
-  decodeFile12 :: [GHC.Types.Char]
-  {- Unfolding: (GHC.CString.unpackCString# "decoded.bin"#) -}
-c68215c9f69af2fee44b14d03598aacc
-  decodeFile13 :: [GHC.Types.Char]
-  {- Unfolding: (GHC.CString.unpackCString#
-                   "Jewel Master (UE) [!].bin"#) -}
-a52c237ede75d02612a6df4eb9a937e4
-  decodeFile2 :: GHC.Types.Int
-  {- Strictness: b -}
-7d1deddb69a76256ec0bfc969adc6950
-  decodeFile3 :: Data.Binary.Get.Decoder GHC.Word.Word16
-  {- Unfolding: (Data.Binary.Get.$wpoly_go
-                   @ GHC.Word.Word16
-                   Main.decodeFile4
-                   0) -}
-3a6003ac7ba8140609a37554a72ef504
-  decodeFile4 :: Data.Binary.Get.Internal.Decoder GHC.Word.Word16
-  {- Unfolding: (Data.Binary.Get.Internal.runGetIncremental1
-                   @ GHC.Word.Word16
-                   Main.decodeFile5) -}
-7846ea3b649a0e1329d0fe2480ffa264
-  decodeFile5 :: Data.Binary.Get.Internal.Decoder GHC.Word.Word16
-  {- Unfolding: (Data.Binary.Get.Internal.readN1
-                   @ GHC.Types.Int
-                   @ Data.ByteString.Internal.ByteString
-                   Main.decodeFile10
-                   Main.decodeFile9
-                   Data.ByteString.Internal.$fMonoidByteString_$cmconcat
-                   Main.decodeFile7
-                     `cast`
-                   (<[Data.ByteString.Internal.ByteString]>_R
-                    ->_R Sym (Data.Binary.Get.Internal.NTCo:Get[0]
-                                  <Data.ByteString.Internal.ByteString>_R))
-                   @ GHC.Word.Word16
-                   Data.ByteString.empty
-                   Main.decodeFile6) -}
-398af24678d426963cad513f4e0e0676
-  decodeFile6 ::
-    Data.ByteString.Internal.ByteString
-    -> Data.ByteString.Internal.ByteString
-    -> Data.Binary.Get.Internal.Decoder GHC.Word.Word16
-  {- Arity: 2, HasNoCafRefs,
-     Unfolding: (\ i' :: Data.ByteString.Internal.ByteString
-                   a14 :: Data.ByteString.Internal.ByteString ->
-                 case a14 of wild { Data.ByteString.Internal.PS dt dt1 dt2 dt3 ->
-                 case GHC.Prim.readWord8OffAddr#
-                        @ GHC.Prim.RealWorld
-                        (GHC.Prim.plusAddr# dt (GHC.Prim.+# dt2 1))
-                        0
-                        GHC.Prim.realWorld# of ds2 { (#,#) ipv ipv1 ->
-                 case GHC.Prim.touch#
-                        @ GHC.ForeignPtr.ForeignPtrContents
-                        dt1
-                        ipv of s' { DEFAULT ->
-                 case GHC.Prim.readWord8OffAddr#
-                        @ GHC.Prim.RealWorld
-                        (GHC.Prim.plusAddr# dt dt2)
-                        0
-                        GHC.Prim.realWorld# of ds1 { (#,#) ipv2 ipv3 ->
-                 case GHC.Prim.touch#
-                        @ GHC.ForeignPtr.ForeignPtrContents
-                        dt1
-                        ipv2 of s'1 { DEFAULT ->
-                 Data.Binary.Get.Internal.Done
-                   @ GHC.Word.Word16
-                   (Data.ByteString.Internal.PS
-                      dt
-                      dt1
-                      (GHC.Prim.+# dt2 2)
-                      (GHC.Prim.-# dt3 2))
-                   (GHC.Word.W16#
-                      (GHC.Prim.or#
-                         (GHC.Prim.uncheckedShiftL# ipv3 8)
-                         ipv1)) } } } } }) -}
-44f6adae77f1c6dfd7f99f2ae546be22
-  decodeFile7 ::
-    [Data.ByteString.Internal.ByteString]
-    -> forall r1.
-       Data.ByteString.Internal.ByteString
-       -> Data.Binary.Get.Internal.Success
-            Data.ByteString.Internal.ByteString r1
-       -> Data.Binary.Get.Internal.Decoder r1
-  {- Arity: 3,
-     Unfolding: (\ bss :: [Data.ByteString.Internal.ByteString]
-                   @ r1
-                   ds :: Data.ByteString.Internal.ByteString[OneShot]
-                   ds1 :: Data.Binary.Get.Internal.Success
-                            Data.ByteString.Internal.ByteString r1[OneShot] ->
-                 case Data.ByteString.Internal.$fMonoidByteString_$cmconcat
-                        bss of dt4 { Data.ByteString.Internal.PS ipv1 ipv2 ipv3 ipv4 ->
-                 Data.Binary.Get.Internal.Fail @ r1 dt4 Main.decodeFile8 }) -}
-3b5be7e7cecb1b9cc2dc133a602ae8c9
-  decodeFile8 :: [GHC.Types.Char]
-  {- Unfolding: (GHC.CString.unpackCString# "not enough bytes"#) -}
-138c8454babbbf42117eda5515ddb7f5
-  decodeFile9 ::
-    GHC.Types.Int
-    -> Data.ByteString.Internal.ByteString
-    -> Data.Either.Either
-         GHC.Types.Int
-         (Data.ByteString.Internal.ByteString,
-          Data.ByteString.Internal.ByteString)
-  {- Arity: 2,
-     Unfolding: (\ n2 :: GHC.Types.Int
-                   str1 :: Data.ByteString.Internal.ByteString[OneShot] ->
-                 case str1 of wild2 { Data.ByteString.Internal.PS dt4 dt5 dt6 dt7 ->
-                 case n2 of wild3 { GHC.Types.I# y ->
-                 case GHC.Prim.tagToEnum#
-                        @ GHC.Types.Bool
-                        (GHC.Prim.>=# dt7 y) of wild4 {
-                   GHC.Types.False
-                   -> Data.Either.Left
-                        @ GHC.Types.Int
-                        @ (Data.ByteString.Internal.ByteString,
-                           Data.ByteString.Internal.ByteString)
-                        (GHC.Types.I# (GHC.Prim.-# y dt7))
-                   GHC.Types.True
-                   -> Data.Either.Right
-                        @ GHC.Types.Int
-                        @ (Data.ByteString.Internal.ByteString,
-                           Data.ByteString.Internal.ByteString)
-                        (wild2, Data.ByteString.empty) } } }) -}
 f7e6e2d86147996a669abce6c2766e86
   deserialize :: Main.LutMap -> [GHC.Types.Bool] -> [Main.RleEntry]
   {- Arity: 2, Strictness: <L,U><S,1*U> -}
@@ -1343,16 +1169,6 @@ b7e5e953d06305cf012b6666615b47c2
                    (case GHC.List.$wlenAcc @ GHC.Word.Word8 w 0 of ww2 { DEFAULT ->
                     GHC.Types.I# (GHC.Prim.-# ww2 1) })
                    (GHC.List.head @ GHC.Word.Word8 w)) -}
-216c65ed7b5644185accb3d4ebf2485a
-  encodeFile :: GHC.Types.IO ()
-  {- Arity: 1, Strictness: <L,U>,
-     Unfolding: InlineRule (0, True, True)
-                Main.encodeFile1 `cast` (Sym (GHC.Types.NTCo:IO[0] <()>_R)) -}
-be8babf524b69a9ba4875475ac46e117
-  encodeFile1 ::
-    GHC.Prim.State# GHC.Prim.RealWorld
-    -> (# GHC.Prim.State# GHC.Prim.RealWorld, () #)
-  {- Arity: 1, Strictness: <L,U> -}
 0bae5145a12f6d26066a60cea3fb8edf
   fillLut ::
     Control.Monad.Trans.State.Lazy.State
@@ -1380,15 +1196,14 @@ be8babf524b69a9ba4875475ac46e117
                    `cast`
                  (Sym (Data.Functor.Identity.NTCo:Identity[0]
                            <(Main.LutMap, Main.StreamCounter GHC.Word.Word8)>_R)) } }) -}
-9af5b81c5403b3e699d39eadea85efec
+0c576cef0c6e3960cfb842fb79cb917f
   getProbability :: GHC.Types.Int -> GHC.Types.Int -> GHC.Types.Int
-  {- Arity: 2, Strictness: <S,1*U(U)><S,1*U(U)>m, Inline: INLINE[0],
+  {- Arity: 2, Strictness: <S,1*U(U)><S,1*U(U)>, Inline: INLINE[0],
      Unfolding: InlineRule (2, True, False)
                 (\ w :: GHC.Types.Int w1 :: GHC.Types.Int ->
                  case w of ww { GHC.Types.I# ww1 ->
                  case w1 of ww2 { GHC.Types.I# ww3 ->
-                 case Main.$wgetProbability ww1 ww3 of ww4 { DEFAULT ->
-                 GHC.Types.I# ww4 } } }) -}
+                 Main.$wgetProbability ww1 ww3 } }) -}
 c999ebc675d87be96310969b908b47c8
   gfxOffset :: GHC.Int.Int64
   {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Int.I64# 239104) -}
@@ -1455,12 +1270,12 @@ b16aca4c63f18e56f49e0d7d1d30f3ec
 b76f4249e2ec2628fcd43fcd4de94a53
   lutEntriesCount :: GHC.Types.Int
   {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Types.I# 252) -}
-f7e720cfc58c8a3b766160e330a8acce
+c0c956c71406d9cb335182d05c0e3cf9
   main :: GHC.Types.IO ()
   {- Arity: 1, Strictness: <L,U>,
      Unfolding: InlineRule (0, True, True)
                 Main.main1 `cast` (Sym (GHC.Types.NTCo:IO[0] <()>_R)) -}
-ee2044e896b3d22ceed6cb0202ea7a3c
+72c47377634a2c851da9a4c8ec9b7dbe
   main1 ::
     GHC.Prim.State# GHC.Prim.RealWorld
     -> (# GHC.Prim.State# GHC.Prim.RealWorld, () #)
@@ -1478,72 +1293,15 @@ ee2044e896b3d22ceed6cb0202ea7a3c
                            of {}
                         : ds3 xs -> Main.main2 xs ipv2 } }
                    GHC.Base.Just argv
-                   -> case argv of wild1 {
-                        []
-                        -> case GHC.List.scanl2
-                           ret_ty (# GHC.Prim.State# GHC.Prim.RealWorld, () #)
-                           of {}
-                        : ds2 xs -> Main.main2 xs ipv } } }) -}
-90efe942b3fec870ea21a939ba1bde88
+                   -> Main.main2 (GHC.List.tail @ GHC.Base.String argv) ipv } }) -}
+a57f186a8b3aee07f7a02ca2308bd280
   main2 ::
     [[GHC.Types.Char]]
     -> GHC.Prim.State# GHC.Prim.RealWorld
     -> (# GHC.Prim.State# GHC.Prim.RealWorld, () #)
-  {- Arity: 2, Strictness: <S,1*U><L,U>,
-     Unfolding: (\ ds :: [[GHC.Types.Char]]
-                   eta :: GHC.Prim.State# GHC.Prim.RealWorld[OneShot] ->
-                 case ds of wild {
-                   [] -> Main.$wa1 eta
-                   : ds1 ds2
-                   -> let {
-                        $wa2 :: GHC.Prim.State# GHC.Prim.RealWorld
-                                -> (# GHC.Prim.State# GHC.Prim.RealWorld, () #)
-                          {- Arity: 1, Strictness: <L,U>, Inline: [0] -}
-                        = \ w :: GHC.Prim.State# GHC.Prim.RealWorld[OneShot] ->
-                          case GHC.Base.eqString ds1 Main.main6 of wild1 {
-                            GHC.Types.False
-                            -> case GHC.Base.eqString ds1 Main.main5 of wild2 {
-                                 GHC.Types.False -> Main.$wa1 w
-                                 GHC.Types.True
-                                 -> case ds2 of wild3 {
-                                      []
-                                      -> GHC.IO.Handle.Text.hPutStr2
-                                           GHC.IO.Handle.FD.stdout
-                                           Main.main4
-                                           GHC.Types.True
-                                           w
-                                      : ipv ipv1 -> Main.$wa1 w } }
-                            GHC.Types.True
-                            -> case ds2 of wild2 {
-                                 [] -> Main.encodeFile1 w
-                                 : ipv ipv1
-                                 -> case GHC.Base.eqString ds1 Main.main5 of wild3 { DEFAULT ->
-                                    Main.$wa1 w } } }
-                      } in
-                      case GHC.Base.eqString ds1 Main.main3 of wild1 {
-                        GHC.Types.False -> $wa2 eta
-                        GHC.Types.True
-                        -> case ds2 of wild2 {
-                             [] -> Main.decodeFile1 eta : ipv ipv1 -> $wa2 eta } } }) -}
-d242312b12d53a7b2790f771aed66436
-  main3 :: [GHC.Types.Char]
-  {- Unfolding: (GHC.CString.unpackCString# "-d"#) -}
-54f2c7875b6a1661145d38ba018f5479
-  main4 :: [GHC.Types.Char]
-  {- Unfolding: (GHC.CString.unpackCString#
-                   "jmArith compression tool 0.1"#) -}
-8b85368a4ba96a280497347727855b76
-  main5 :: [GHC.Types.Char]
-  {- Unfolding: (GHC.CString.unpackCString# "-v"#) -}
-c06fd550a570fd9726e65c113997d685
-  main6 :: [GHC.Types.Char]
-  {- Unfolding: (GHC.CString.unpackCString# "-e"#) -}
-553310f8aec789c132a885ae8d3ece3e
-  main7 :: [GHC.Types.Char]
-  {- Unfolding: (GHC.CString.unpackCString#
-                   "Usage: jmArith [-vde]"#) -}
-d606597acdc2cff709c17041bc0b561c
-  main8 ::
+  {- Arity: 2, Strictness: <S,1*U><L,U> -}
+cfcdb000fe362b230a763b48f3e448fa
+  main3 ::
     GHC.Prim.State# GHC.Prim.RealWorld
     -> (# GHC.Prim.State# GHC.Prim.RealWorld, () #)
   {- Arity: 1,
@@ -1575,13 +1333,6 @@ ec0243367099e8bb8d666a5d8bb38b28
      Unfolding: InlineRule (1, True, False)
                 (\ @ a9 ds :: Main.StreamCounter a9 ->
                  case ds of wild { Main.StreamCounter ds1 ds2 ds3 -> ds3 }) -}
-5a9461b3f592242e548d24e9ea393966
-  parse :: [[GHC.Types.Char]] -> GHC.Types.IO ()
-  {- Arity: 2, Strictness: <S,1*U><L,U>,
-     Unfolding: InlineRule (0, True, True)
-                Main.main2
-                  `cast`
-                (<[[GHC.Types.Char]]>_R ->_R Sym (GHC.Types.NTCo:IO[0] <()>_R)) -}
 5ca6c8fb3a4b80aab2ae784328a7f5a6
   rleCount :: Main.LutEntry -> GHC.Word.Word8
   RecSel Main.LutEntry
@@ -1706,12 +1457,12 @@ a2e17f76b2fe4cb9b437442a165b098d
                    @ GHC.Types.Bool
                    GHC.Types.True
                    (GHC.Types.[] @ GHC.Types.Bool)) -}
-826498797876d31892a644c5bb0e7ffd
+cc71697d04a5ad372c04e2cc00aa46fa
   serializeLutMap :: Main.LutMap -> [GHC.Word.Word8]
   {- Arity: 1, HasNoCafRefs, Strictness: <S,1*U>m2,
      Unfolding: InlineRule (1, True, False)
                 (\ m :: Main.LutMap ->
-                 Main.serializeLutMap_serialize
+                 Main.serializeLutMap_serializeMap
                    Main.serializeLutMap2
                    (Data.OldList.sortBy
                       @ (GHC.Word.Word8, Main.LutEntry)
@@ -1752,15 +1503,15 @@ a2e17f76b2fe4cb9b437442a165b098d
   serializeLutMap2 :: GHC.Word.Word8
   {- HasNoCafRefs, Strictness: m,
      Unfolding: (GHC.Word.W8# __word 255) -}
-7e39542107cdc85bb6c603bfd6282dbc
-  serializeLutMap_serialize ::
+f9a0a1ce93fb381d5137ab6e9ef14d85
+  serializeLutMap_serializeMap ::
     GHC.Word.Word8
     -> [(GHC.Word.Word8, Main.LutEntry)] -> [GHC.Word.Word8]
   {- Arity: 2, HasNoCafRefs, Strictness: <L,1*U(U)><S,1*U>m2,
      Inline: INLINE[0],
      Unfolding: InlineRule (2, True, False)
                 (\ w :: GHC.Word.Word8 w1 :: [(GHC.Word.Word8, Main.LutEntry)] ->
-                 case Main.$wserialize w w1 of ww { (#,#) ww1 ww2 ->
+                 case Main.$wserializeMap w w1 of ww { (#,#) ww1 ww2 ->
                  GHC.Types.: @ GHC.Word.Word8 ww1 ww2 }) -}
 e3afad637ca09bfccb4eea9c1265e0ef
   splitNybbles :: [GHC.Word.Word8] -> [GHC.Word.Word8]

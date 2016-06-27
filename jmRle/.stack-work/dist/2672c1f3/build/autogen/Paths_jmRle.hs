@@ -16,11 +16,11 @@ version :: Version
 version = Version [0,1,0,0] []
 bindir, libdir, datadir, libexecdir, sysconfdir :: FilePath
 
-bindir     = "E:\\Projects\\JewelMaster\\jmRle\\.stack-work\\install\\03c0d273\\bin"
-libdir     = "E:\\Projects\\JewelMaster\\jmRle\\.stack-work\\install\\03c0d273\\lib\\x86_64-windows-ghc-7.10.3\\jmRle-0.1.0.0-D6rkKOicAWZ1aqPJlDDyjo"
-datadir    = "E:\\Projects\\JewelMaster\\jmRle\\.stack-work\\install\\03c0d273\\share\\x86_64-windows-ghc-7.10.3\\jmRle-0.1.0.0"
-libexecdir = "E:\\Projects\\JewelMaster\\jmRle\\.stack-work\\install\\03c0d273\\libexec"
-sysconfdir = "E:\\Projects\\JewelMaster\\jmRle\\.stack-work\\install\\03c0d273\\etc"
+bindir     = "H:\\Projects\\JewelMaster\\jmRle\\.stack-work\\install\\03c0d273\\bin"
+libdir     = "H:\\Projects\\JewelMaster\\jmRle\\.stack-work\\install\\03c0d273\\lib\\x86_64-windows-ghc-7.10.3\\jmRle-0.1.0.0-D6rkKOicAWZ1aqPJlDDyjo"
+datadir    = "H:\\Projects\\JewelMaster\\jmRle\\.stack-work\\install\\03c0d273\\share\\x86_64-windows-ghc-7.10.3\\jmRle-0.1.0.0"
+libexecdir = "H:\\Projects\\JewelMaster\\jmRle\\.stack-work\\install\\03c0d273\\libexec"
+sysconfdir = "H:\\Projects\\JewelMaster\\jmRle\\.stack-work\\install\\03c0d273\\etc"
 
 getBinDir, getLibDir, getDataDir, getLibexecDir, getSysconfDir :: IO FilePath
 getBinDir = catchIO (getEnv "jmRle_bindir") (\_ -> return bindir)
